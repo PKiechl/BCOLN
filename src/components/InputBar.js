@@ -4,7 +4,7 @@ class InputBar extends React.Component {
   state = { amount: "" };
 
   onInputChange = event => {
-    this.setState({ amount: event.target.value });
+    this.setState({ amount: event.target.value.replace(/[^0-9]/g, '') });
   };
 
   onFormSubmit = event => {
@@ -16,12 +16,13 @@ class InputBar extends React.Component {
     return (
       <div className="search bar ui segment">
         <form onSubmit={this.onFormSubmit} className="ui form">
-          <label>Bet Amount</label>
+          <label>Bet Amount (input numbers only) </label>
           <input
             type="text"
             value={this.state.amount}
             onChange={this.onInputChange}
           />
+          <button className="ui button">Confirm</button>
         </form>
       </div>
     );
