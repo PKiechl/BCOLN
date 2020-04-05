@@ -6,8 +6,7 @@ class InputBar extends React.Component {
   onInputChange = event => {
     //sets the entered amount into the state
     //only integers can be entered for now
-    //todo: change validation to include decimals as well, spending full ETH's is "too expensive"
-    this.setState({ amount: event.target.value.replace(/[^0-9]/g, "") });
+    this.setState({ amount: event.target.value.replace(/[^0-9.]/g, "") });
   };
 
   onFormSubmit = event => {
