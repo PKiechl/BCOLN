@@ -1,5 +1,24 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Truffle
+
+[Truffle docs](https://www.trufflesuite.com/docs)
+
+Install Truffle:
+```shell script
+npm install -g truffle
+```
+
+Compile contracts (within `truffle/` directory):
+```shell script
+truffle compile
+```
+
+Deploy contracts to Ganache (within `truffle/` directory):
+```shell script
+truffle migrate
+```
+
 ## Available Scripts
 
 In the project directory, you can run:

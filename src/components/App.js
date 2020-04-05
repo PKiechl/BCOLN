@@ -1,17 +1,18 @@
 import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
-import ABI from "../ABI";
+import data from "../truffle/build/contracts/test1.json";
 
 //RPC server from GANACHE,
-// TODO check if is same for all
 const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
 web3.eth.defaultAccount = web3.eth.accounts[0];
 
-//TODO: address change needed when redeployed
+let abi = data.abi;
+let contract_address = data.networks[5777].address;
+
 const TestContract = new web3.eth.Contract(
-  ABI,
-  "0x35DDdCa9723Ea7FeC9884eDc10337dECae515cc2"
+  abi,
+  contract_address
 );
 
 class App extends React.Component {
