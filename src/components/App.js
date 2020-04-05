@@ -18,33 +18,21 @@ const TestContract = new web3.eth.Contract(
 class App extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
-  setValue = amount => {
-    //todo: call smart contract with this amount here
-    console.log(amount);
-    this.getData(amount);
+  state = {
+    amount: null
   };
 
-  getData = async event => {
-    //TODO just for test contract, not sure if we will need a get on the contract?
-    //TODO do something with promise
-    await TestContract.methods
-      .get()
-      .call()
-      .then(console.log);
+  callContractGet = async event => {
+    const amount = await TestContract.methods.get().call();
+    this.setState({amount: amount});
   };
 
-  setData = async amount => {
-    // const amount = this.state.amount;
-    // event.preventDefault();
-      console.log(amount);
-      console.log()
-
-    const accounts = await window.ethereum.enable();
+  callContractSet = async amount => {
+    const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
-    const gas = await TestContract.methods.set(amount).estimateGas();
-    const result = await TestContract.methods
-      .set(amount)
-      .send({ from: account, gas });
+    const res = await TestContract.methods.set(amount);
+    const gas = await res.estimateGas();
+    const result = await res.send({ from: account, gas });
     console.log(result);
   };
 
@@ -53,7 +41,16 @@ class App extends React.Component {
     return (
       <div className="ui container">
         <h1 className="ui header">Roulette</h1>
-        <InputBar onFormSubmit={this.setValue} />
+        <InputBar onFormSubmit={this.callContractSet} />
+
+        <button className="ui button" onClick={this.callContractGet}>Get Amount</button>
+
+        <div className="ui message">
+          <div className="header">
+              Current Amount
+          </div>
+          <p>{this.state.amount}</p>
+        </div>
       </div>
     );
   }
