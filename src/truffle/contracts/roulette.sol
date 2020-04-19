@@ -19,6 +19,7 @@ contract roulette{
     uint readyCount;
     uint clientCount;
     Oracle oracle;
+    uint randomNumber;
 
 
     //#################### CONSTRUCTOR #################################################################################
@@ -27,26 +28,29 @@ contract roulette{
         readyCount = 0;
         clientCount = 0;
         gameFinished = false;
+
     }
 
     //#################### METHODS #####################################################################################
     //### CLIENT-RELATED
     function join() public {
         // allows client to enter the game
-        // TODO
+        clientCount=clientCount+1;
     }
     function leave() public {
         // allows client to leave the game
-        // TODO
+        clientCount=clientCount-1;
     }
     function setReady() public {
         // allows client to mark as ready / finished betting
-        // TODO
+        readyCount=readyCount+1;
+        allReady();
     }
-    function getResult() public {
+    function getResult() public view returns (uint){
         // allows clients to get the results of a finished game
         require (gameFinished);
         // TODO
+        return (randomNumber);
     }
 
     //### GAME MANAGEMENT
@@ -55,8 +59,14 @@ contract roulette{
             playRoulette();
         }
     }
+
+    function getRandomNumber()public{
+        gameFinished=true;
+        randomNumber=oracle.generateRandomNumber();
+    }
+
     function playRoulette() private {
-        uint randomNumber = oracle.generateRandomNumber();
+        getRandomNumber();
         // TODO
         teardown();
     }
@@ -71,7 +81,7 @@ contract roulette{
     }
 
 
-    //### BETS
+//    ### BETS
     // TODO: verify if these are all possible bets
     function betRed(uint amount) public {
         // TODO
@@ -119,5 +129,9 @@ contract roulette{
         // TODO
     }
 
+    //test function for now to get the random Number.
+    function get() public view returns (uint){
+        return (randomNumber);
+    }
 
 }

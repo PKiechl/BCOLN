@@ -9,6 +9,7 @@ var RouletteContract = artifacts.require("./roulette.sol");
 
 module.exports = (deployer, network) =>{
   deployer.deploy(MyContract).then(function(){
-    return deployer.deploy(RouletteContract, MyContract.address)
+    // console.log(MyContract.address);
+    return deployer.deploy(RouletteContract, MyContract.address);
   });
 };
