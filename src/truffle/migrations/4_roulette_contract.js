@@ -1,6 +1,7 @@
-var MyContract = artifacts.require("oracle");
+var MyContract = artifacts.require("roulette");
 
 module.exports = function(deployer) {
   // deployment steps
+  //
   deployer.deploy(MyContract);
 };

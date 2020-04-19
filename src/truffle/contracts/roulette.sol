@@ -3,13 +3,6 @@ import "./oracle.sol";
 
 contract roulette{
 
-    constructor(address _oracleAddress) public {
-        oracle = Oracle(_oracleAddress);
-        readyCount = 0;
-        clientCount = 0;
-        gameFinished = false;
-    }
-
     //#################### CUSTOM TYPES ################################################################################
     struct bet {
         // instead of having to keep track of the types of bets the clients make, simply collect the winning numbers affected
@@ -26,6 +19,15 @@ contract roulette{
     uint readyCount;
     uint clientCount;
     Oracle oracle;
+
+
+    //#################### CONSTRUCTOR #################################################################################
+    constructor(address _oracleAddress) public {
+        oracle = Oracle(_oracleAddress);
+        readyCount = 0;
+        clientCount = 0;
+        gameFinished = false;
+    }
 
     //#################### METHODS #####################################################################################
     //### CLIENT-RELATED
