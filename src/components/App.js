@@ -1,7 +1,9 @@
 import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
-import data from "../truffle/build/contracts/test1.json";
+// import data from "../truffle/build/contracts/test1.json";
+import data from "../truffle/build/contracts/roulette.json";
+
 
 //RPC server from GANACHE,
 const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
