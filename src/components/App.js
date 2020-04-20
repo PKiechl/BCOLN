@@ -2,7 +2,14 @@ import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
 import data from "../truffle/build/contracts/roulette.json";
-// import data from "../truffle/build/contracts/test1.json";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams
+} from "react-router-dom";
 
 //RPC server from GANACHE,
 const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
@@ -25,7 +32,7 @@ class App extends React.Component {
     //todo for debugging purposes
     event.preventDefault();
     const res = await TestContract.methods.get().call();
-    this.setState({winningNumber:res});
+    this.setState({ winningNumber: res });
   };
 
   ///////////////////////////
@@ -68,7 +75,7 @@ class App extends React.Component {
       gasPrice: 2000,
       gasLimit: "500000"
     });
-    console.log("called ready" , result);
+    console.log("called ready", result);
   };
 
   callBet = async amount => {
@@ -103,11 +110,13 @@ class App extends React.Component {
       gasLimit: "500000"
     });
     console.log("joined", result);
+    let url = window.location.href;
+    window.location.href = url+"game";
   };
 
   setAccountAddress = accAddress => {
     this.setState({ address: accAddress });
-    console.log("address set: ",this.state.address);
+    console.log("address set: ", this.state.address);
   };
 
   componentDidMount = async () => {
@@ -132,28 +141,43 @@ class App extends React.Component {
   render() {
     //renders the InputBar, where the bet amount is entered and returned back to this component
     return (
-      <div className="ui container">
-        <h1 className="ui header">Roulette</h1>
-        <InputBar onFormSubmit={this.callBet} inputText={"enter amount"} />
-        <InputBar
-          onFormSubmit={this.setAccountAddress}
-          inputText={"enter address"}
-        />
+      <Router>
+        <div>
+          <Switch>
+            <Route exact path="/">
 
-        <button className="ui button" onClick={this.callContractGet}>
-          Get random number
-        </button>
-        <button className="ui button" onClick={this.callSetReady}>
-          Set Ready
-        </button>
-        <button className="ui button" onClick={this.callJoin}>
-          Join
-        </button>
-        <div className="ui message">
-          <div className="header">Winning Number</div>
-          <p>{this.state.winningNumber}</p>
+              <button className="ui button" onClick={this.callJoin}>
+                Join
+              </button>
+            </Route>
+            <Route path="/game">
+              <div className="ui container">
+                <h1 className="ui header">Roulette</h1>
+                <InputBar
+                  onFormSubmit={this.callBet}
+                  inputText={"enter amount"}
+                />
+                <InputBar
+                    onFormSubmit={this.setAccountAddress}
+                    inputText={"enter address"}
+                />
+
+                <button className="ui button" onClick={this.callContractGet}>
+                  Get random number
+                </button>
+                <button className="ui button" onClick={this.callSetReady}>
+                  Set Ready
+                </button>
+
+                <div className="ui message">
+                  <div className="header">Winning Number</div>
+                  <p>{this.state.winningNumber}</p>
+                </div>
+              </div>
+            </Route>
+          </Switch>
         </div>
-      </div>
+      </Router>
     );
   }
 }
