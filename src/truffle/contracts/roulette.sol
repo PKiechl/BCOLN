@@ -20,7 +20,7 @@ contract roulette{
     uint clientCount;
     Oracle oracle;
     uint256 randomNumber;
-    uint8 lastRoundWinningNumber;
+    uint256 lastRoundWinningNumber;
 
 
     //#################### CONSTRUCTOR #################################################################################
@@ -102,6 +102,7 @@ contract roulette{
         lastRoundWinningNumber=randomNumber;
         delete randomNumber;
         delete bets;
+        gameFinished=false;
     }
 
 
@@ -115,6 +116,7 @@ contract roulette{
     }
 
     function betBlack() payable public {
+        require(!gameFinished);
         bet memory temp;
         temp.winningAmount =  msg.value*2;
         temp.owner = msg.sender;

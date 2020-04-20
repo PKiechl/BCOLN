@@ -17,7 +17,7 @@ class App extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
   state = {
-    // amount: null,
+    winningNumber: null,
     address: null
   };
 
@@ -25,7 +25,7 @@ class App extends React.Component {
     //todo for debugging purposes
     event.preventDefault();
     const res = await TestContract.methods.get().call();
-    console.log(res);
+    this.setState({winningNumber:res});
   };
 
   ///////////////////////////
@@ -150,8 +150,8 @@ class App extends React.Component {
           Join
         </button>
         <div className="ui message">
-          <div className="header">Current Amount</div>
-          <p>{this.state.amount}</p>
+          <div className="header">Winning Number</div>
+          <p>{this.state.winningNumber}</p>
         </div>
       </div>
     );
