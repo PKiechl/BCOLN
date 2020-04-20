@@ -17,18 +17,14 @@ class App extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
   state = {
-    amount: null
+    // amount: null,
+    address: null
   };
 
   callContractGet = async event => {
+    //todo for debugging purposes
     event.preventDefault();
-    // const accounts = await web3.eth.getAccounts();
-    //todo: need to pick correct account, not sure how to do that
-    // const account = accounts[0];
     const res = await TestContract.methods.get().call();
-    // const gas = await res.estimateGas();
-    // const result = await res.send({ from: account, gas });
-    // console.log(result);
     console.log(res);
   };
 
@@ -42,8 +38,9 @@ class App extends React.Component {
   // im idealfall aber im contract selber ghandlet und ned im client->google
 
   callContractSet = async amount => {
-    const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
+    // const accounts = await web3.eth.getAccounts();
+    // const account = accounts[0];
+    const account = this.state.address;
     // const res = await TestContract.methods.set(amount);
     const res = await TestContract.methods.getRandomNumber();
 
@@ -56,53 +53,80 @@ class App extends React.Component {
     //   console.log('rnumber',rNumber);
   };
 
-    callSetReady = async event => {
-        event.preventDefault();
-        const accounts = await web3.eth.getAccounts();
-        //todo: need to pick correct account, not sure how to do that
-        const account = accounts[5];
-        const res = await TestContract.methods.setReady();
-
-        const gas = await res.estimateGas();
-        const result = await res.send({
-            from: account,
-            gasPrice: 2000,
-            gasLimit: "500000",
-        });
-        console.log(result);
-    };
-
-
-  callBet = async event => {
-    const accounts = await web3.eth.getAccounts();
+  callSetReady = async event => {
+    event.preventDefault();
+    // const accounts = await web3.eth.getAccounts();
     //todo: need to pick correct account, not sure how to do that
-    const account = accounts[5];
+    // const account = accounts[5];
+    const account = this.state.address;
+
+    const res = await TestContract.methods.setReady();
+
+    const gas = await res.estimateGas();
+    const result = await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000"
+    });
+    console.log("called ready" , result);
+  };
+
+  callBet = async amount => {
+    // const accounts = await web3.eth.getAccounts();
+    //todo: need to pick correct account, not sure how to do that
+
+    // const account = accounts[5];
     // const res = await TestContract.methods.set(amount);
-    const res = await TestContract.methods.betBlack(99);
+    const account = this.state.address;
+    const res = await TestContract.methods.betBlack();
 
     const gas = await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei("1", "ether")
+      value: web3.utils.toWei(amount, "ether")
     });
-    console.log(result);
+    console.log("bet called with: ", amount);
   };
 
-  callJoin = async event =>{
-      event.preventDefault();
-      const accounts = await web3.eth.getAccounts();
-      //todo: need to pick correct account, not sure how to do that
-      const account = accounts[5];
-      const res = await TestContract.methods.join();
-      const gas = await res.estimateGas();
+  callJoin = async event => {
+    event.preventDefault();
+    const accounts = await web3.eth.getAccounts();
+    //todo: need to pick correct account, not sure how to do that
+    const account = accounts[5];
+    const res = await TestContract.methods.join();
+    const gas = await res.estimateGas();
+    const result = await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000"
+    });
+    console.log("joined", result);
+  };
+
+  setAccountAddress = accAddress => {
+    this.setState({ address: accAddress });
+    console.log("address set: ",this.state.address);
+  };
+
+  componentDidMount = async () => {
+    const accounts = await web3.eth.getAccounts();
+    //todo: need to pick correct account, not sure how to do that
+    const account = accounts[0];
+    const balance = await web3.eth.getBalance(account);
+    const eths = web3.utils.fromWei(balance.toString(), "ether");
+    // if(!web3.eth.getBalance(account)===100) {
+    console.log(eths);
+    if (eths > 95) {
+      const res = await TestContract.methods.startup();
       const result = await res.send({
-          from: account,
-          gasPrice: 2000,
-          gasLimit: "500000",
+        from: account,
+        gasPrice: 2000,
+        gasLimit: "500000",
+        value: web3.utils.toWei("95", "ether")
       });
-      console.log(result);
+    }
   };
 
   render() {
@@ -110,7 +134,11 @@ class App extends React.Component {
     return (
       <div className="ui container">
         <h1 className="ui header">Roulette</h1>
-        <InputBar onFormSubmit={this.callBet} />
+        <InputBar onFormSubmit={this.callBet} inputText={"enter amount"} />
+        <InputBar
+          onFormSubmit={this.setAccountAddress}
+          inputText={"enter address"}
+        />
 
         <button className="ui button" onClick={this.callContractGet}>
           Get random number

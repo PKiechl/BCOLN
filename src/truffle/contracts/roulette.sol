@@ -20,6 +20,7 @@ contract roulette{
     uint clientCount;
     Oracle oracle;
     uint256 randomNumber;
+    uint8 lastRoundWinningNumber;
 
 
     //#################### CONSTRUCTOR #################################################################################
@@ -37,21 +38,29 @@ contract roulette{
         // allows client to enter the game
         clientCount=clientCount+1;
     }
+
     function leave() public {
         // allows client to leave the game
         require(clientCount>=1);
         clientCount=clientCount-1;
     }
+
+    function startup() payable public{
+        //TODO: don't touch it:)
+        //startup function, such that ethers get sent to the contract after it's deployed.
+    }
+
     function setReady() public {
         // allows client to mark as ready / finished betting
         readyCount=readyCount+1;
         allReady();
     }
-    function getResult() public view returns (uint){
+
+    function get() public view returns (uint){
         // allows clients to get the results of a finished game
         require (gameFinished);
         // TODO
-        return (randomNumber);
+        return (lastRoundWinningNumber);
     }
 
     //### GAME MANAGEMENT
@@ -77,7 +86,7 @@ contract roulette{
             bet memory temp=bets[i];
             for(uint j=0;j<temp.winningNumbers.length;j++){
                 if(randomNumber==temp.winningNumbers[j]){
-                    payout(temp.owner,temp.winningAmount/4);
+                    payout(temp.owner,temp.winningAmount);
                 }
             }
         }
@@ -90,7 +99,8 @@ contract roulette{
     function teardown() private {
         clientCount=0;
         readyCount=0;
-        randomNumber=99;
+        lastRoundWinningNumber=randomNumber;
+        delete randomNumber;
         delete bets;
     }
 
@@ -104,7 +114,7 @@ contract roulette{
 
     }
 
-    function betBlack(uint amount) payable public {
+    function betBlack() payable public {
         bet memory temp;
         temp.winningAmount =  msg.value*2;
         temp.owner = msg.sender;
@@ -134,7 +144,7 @@ contract roulette{
     function betEven(uint amount) public {
         // TODO
     }
-    function betUneven(uint amount) public {
+    function betOdd(uint amount) public {
         // TODO
     }
     function betFirstDozen(uint amount) public {
@@ -169,11 +179,6 @@ contract roulette{
     }
     function betComboFour(uint number, uint number2, uint number3, uint number4, uint amount) public {
         // TODO
-    }
-
-    //test function for now to get the random Number.
-    function get() public view returns (uint256){
-        return randomNumber;
     }
 
 
