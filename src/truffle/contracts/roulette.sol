@@ -7,10 +7,10 @@ contract roulette{
     struct bet {
         // instead of having to keep track of the types of bets the clients make, simply collect the winning numbers affected
         // by the type of bet received -> easier evaluation
-        address payable owner;
+        address owner;
         uint winningAmount;
         // NOTE: there is seemingly no float type only a fixed-point type which is "not fully supported"...
-        uint[] winningNumbers;
+        uint8[]  winningNumbers;
     }
 
     //#################### ATTRIBUTES ##################################################################################
@@ -19,7 +19,7 @@ contract roulette{
     uint readyCount;
     uint clientCount;
     Oracle oracle;
-    uint randomNumber;
+    uint256 randomNumber;
 
 
     //#################### CONSTRUCTOR #################################################################################
@@ -28,6 +28,8 @@ contract roulette{
         readyCount = 0;
         clientCount = 0;
         gameFinished = false;
+        //
+//        randomNumber;
 
     }
 
@@ -39,6 +41,7 @@ contract roulette{
     }
     function leave() public {
         // allows client to leave the game
+        require(clientCount>=1);
         clientCount=clientCount-1;
     }
     function setReady() public {
@@ -82,12 +85,31 @@ contract roulette{
 
 
 //    ### BETS
+    //https://livecasino.com/wp-content/uploads/2018/12/How-to-bet-on-roulette-Red.png
     // TODO: verify if these are all possible bets
     function betRed(uint amount) public {
         // TODO
+        //red: 1,3,5,7,9, 12, 14, 16, 18, 19,21, 23, 25, 27,30,32,34,36
+
     }
     function betBlack(uint amount) public {
         // TODO
+        bet memory temp;
+        temp.winningAmount = amount*2;
+        temp.owner = msg.sender;
+//        uint8[] memory numbers = new uint8[](36);
+//        numbers.push([1,3,5]);
+        uint8[] memory numbers=new uint8[](18);
+        numbers[0]=1;
+        numbers[1]=3;
+        numbers[2]=3;
+
+        uint8[4] memory adaArr = [1, 3, 5, 7];
+
+
+
+    temp.winningNumbers=adaArr;
+        bets.push(temp);
     }
     function betEven(uint amount) public {
         // TODO
@@ -130,8 +152,9 @@ contract roulette{
     }
 
     //test function for now to get the random Number.
-    function get() public view returns (uint){
-        return (randomNumber);
+    function get() public view returns (uint256){
+        return randomNumber;
     }
+
 
 }

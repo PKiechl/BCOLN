@@ -22,8 +22,14 @@ class App extends React.Component {
 
   callContractGet = async event => {
     event.preventDefault();
-    const amount = await TestContract.methods.get().call();
-    console.log(amount);
+      // const accounts = await web3.eth.getAccounts();
+      //todo: need to pick correct account, not sure how to do that
+      // const account = accounts[0];
+    const res = await TestContract.methods.get().call();
+      // const gas = await res.estimateGas();
+      // const result = await res.send({ from: account, gas });
+      // console.log(result);
+    console.log(res);
   };
 
   ///////////////////////////
@@ -44,6 +50,10 @@ class App extends React.Component {
     const gas = await res.estimateGas();
     const result = await res.send({ from: account, gas });
     console.log(result);
+
+    //
+    //   const rNumber = await TestContract.methods.get().call();
+    //   console.log('rnumber',rNumber);
   };
 
   callSetReady = async event =>{
@@ -51,7 +61,7 @@ class App extends React.Component {
       //todo: need to pick correct account, not sure how to do that
       const account = accounts[0];
       // const res = await TestContract.methods.set(amount);
-      const res = await TestContract.methods.setReady();
+      const res = await TestContract.methods.betBlack(99);
 
       const gas = await res.estimateGas();
       const result = await res.send({ from: account, gas });
