@@ -22,13 +22,13 @@ class App extends React.Component {
 
   callContractGet = async event => {
     event.preventDefault();
-      // const accounts = await web3.eth.getAccounts();
-      //todo: need to pick correct account, not sure how to do that
-      // const account = accounts[0];
+    // const accounts = await web3.eth.getAccounts();
+    //todo: need to pick correct account, not sure how to do that
+    // const account = accounts[0];
     const res = await TestContract.methods.get().call();
-      // const gas = await res.estimateGas();
-      // const result = await res.send({ from: account, gas });
-      // console.log(result);
+    // const gas = await res.estimateGas();
+    // const result = await res.send({ from: account, gas });
+    // console.log(result);
     console.log(res);
   };
 
@@ -48,7 +48,7 @@ class App extends React.Component {
     const res = await TestContract.methods.getRandomNumber();
 
     const gas = await res.estimateGas();
-    const result = await res.send({ from: account, gasPrice: gas});
+    const result = await res.send({ from: account, gasPrice: gas });
     console.log(result);
 
     //
@@ -56,19 +56,53 @@ class App extends React.Component {
     //   console.log('rnumber',rNumber);
   };
 
-  callSetReady = async event =>{
+    callSetReady = async event => {
+        event.preventDefault();
+        const accounts = await web3.eth.getAccounts();
+        //todo: need to pick correct account, not sure how to do that
+        const account = accounts[5];
+        const res = await TestContract.methods.setReady();
+
+        const gas = await res.estimateGas();
+        const result = await res.send({
+            from: account,
+            gasPrice: 2000,
+            gasLimit: "500000",
+        });
+        console.log(result);
+    };
+
+
+  callBet = async event => {
+    const accounts = await web3.eth.getAccounts();
+    //todo: need to pick correct account, not sure how to do that
+    const account = accounts[5];
+    // const res = await TestContract.methods.set(amount);
+    const res = await TestContract.methods.betBlack(99);
+
+    const gas = await res.estimateGas();
+    const result = await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000",
+      value: web3.utils.toWei("1", "ether")
+    });
+    console.log(result);
+  };
+
+  callJoin = async event =>{
       event.preventDefault();
       const accounts = await web3.eth.getAccounts();
       //todo: need to pick correct account, not sure how to do that
       const account = accounts[5];
-      // const res = await TestContract.methods.set(amount);
-      const res = await TestContract.methods.betBlack(99);
-
+      const res = await TestContract.methods.join();
       const gas = await res.estimateGas();
-      const result = await res.send({ from: account, gasPrice: 2000,   gasLimit: "500000",
-          value: web3.utils.toWei('1', "ether")});
+      const result = await res.send({
+          from: account,
+          gasPrice: 2000,
+          gasLimit: "500000",
+      });
       console.log(result);
-
   };
 
   render() {
@@ -76,7 +110,7 @@ class App extends React.Component {
     return (
       <div className="ui container">
         <h1 className="ui header">Roulette</h1>
-        <InputBar onFormSubmit={this.callContractSet} />
+        <InputBar onFormSubmit={this.callBet} />
 
         <button className="ui button" onClick={this.callContractGet}>
           Get random number
@@ -84,7 +118,9 @@ class App extends React.Component {
         <button className="ui button" onClick={this.callSetReady}>
           Set Ready
         </button>
-
+        <button className="ui button" onClick={this.callJoin}>
+          Join
+        </button>
         <div className="ui message">
           <div className="header">Current Amount</div>
           <p>{this.state.amount}</p>

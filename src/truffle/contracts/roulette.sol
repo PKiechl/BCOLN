@@ -28,8 +28,6 @@ contract roulette{
         readyCount = 0;
         clientCount = 0;
         gameFinished = false;
-        //
-//        randomNumber;
 
     }
 
@@ -70,18 +68,30 @@ contract roulette{
 
     function playRoulette() private {
         getRandomNumber();
-        // TODO
+        evaluate();
         teardown();
     }
-    function evaluate(uint winningNumber) private {
-        // TODO
+
+    function evaluate() private {
+        for(uint i=0;i<bets.length;i++){
+            bet memory temp=bets[i];
+            for(uint j=0;j<temp.winningNumbers.length;j++){
+                if(randomNumber==temp.winningNumbers[j]){
+                    payout(temp.owner,temp.winningAmount/4);
+                }
+            }
+        }
     }
+
     function payout(address payable owner, uint winningAmount) private {
         owner.transfer(winningAmount);
     }
 
     function teardown() private {
-        // TODO
+        clientCount=0;
+        readyCount=0;
+        randomNumber=99;
+        delete bets;
     }
 
 
@@ -93,13 +103,11 @@ contract roulette{
         //red: 1,3,5,7,9, 12, 14, 16, 18, 19,21, 23, 25, 27,30,32,34,36
 
     }
+
     function betBlack(uint amount) payable public {
-        // TODO
         bet memory temp;
         temp.winningAmount =  msg.value*2;
         temp.owner = msg.sender;
-//        uint8[] memory numbers = new uint8[](36);
-//        numbers.push([1,3,5]);
         uint8[] memory numbers=new uint8[](18);
         numbers[0]=2;
         numbers[1]=4;
@@ -121,9 +129,8 @@ contract roulette{
         numbers[17]=35;
         temp.winningNumbers = numbers;
         bets.push(temp);
-
-        payout(temp.owner, temp.winningAmount/4);
     }
+
     function betEven(uint amount) public {
         // TODO
     }
