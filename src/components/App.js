@@ -48,7 +48,7 @@ class App extends React.Component {
     const res = await TestContract.methods.getRandomNumber();
 
     const gas = await res.estimateGas();
-    const result = await res.send({ from: account, gas });
+    const result = await res.send({ from: account, gasPrice: gas});
     console.log(result);
 
     //
@@ -57,14 +57,16 @@ class App extends React.Component {
   };
 
   callSetReady = async event =>{
+      event.preventDefault();
       const accounts = await web3.eth.getAccounts();
       //todo: need to pick correct account, not sure how to do that
-      const account = accounts[0];
+      const account = accounts[5];
       // const res = await TestContract.methods.set(amount);
       const res = await TestContract.methods.betBlack(99);
 
       const gas = await res.estimateGas();
-      const result = await res.send({ from: account, gas });
+      const result = await res.send({ from: account, gasPrice: 2000,   gasLimit: "500000",
+          value: web3.utils.toWei('1', "ether")});
       console.log(result);
 
   };

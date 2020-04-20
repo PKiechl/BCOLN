@@ -7,7 +7,7 @@ contract roulette{
     struct bet {
         // instead of having to keep track of the types of bets the clients make, simply collect the winning numbers affected
         // by the type of bet received -> easier evaluation
-        address owner;
+        address payable owner;
         uint winningAmount;
         // NOTE: there is seemingly no float type only a fixed-point type which is "not fully supported"...
         uint8[]  winningNumbers;
@@ -23,7 +23,7 @@ contract roulette{
 
 
     //#################### CONSTRUCTOR #################################################################################
-    constructor(address _oracleAddress) public {
+    constructor(address _oracleAddress) payable public {
         oracle = Oracle(_oracleAddress);
         readyCount = 0;
         clientCount = 0;
@@ -76,9 +76,10 @@ contract roulette{
     function evaluate(uint winningNumber) private {
         // TODO
     }
-    function payout(address owner, uint winningNumber) private {
-        // TODO
+    function payout(address payable owner, uint winningAmount) private {
+        owner.transfer(winningAmount);
     }
+
     function teardown() private {
         // TODO
     }
@@ -92,24 +93,36 @@ contract roulette{
         //red: 1,3,5,7,9, 12, 14, 16, 18, 19,21, 23, 25, 27,30,32,34,36
 
     }
-    function betBlack(uint amount) public {
+    function betBlack(uint amount) payable public {
         // TODO
         bet memory temp;
-        temp.winningAmount = amount*2;
+        temp.winningAmount =  msg.value*2;
         temp.owner = msg.sender;
 //        uint8[] memory numbers = new uint8[](36);
 //        numbers.push([1,3,5]);
         uint8[] memory numbers=new uint8[](18);
-        numbers[0]=1;
-        numbers[1]=3;
-        numbers[2]=3;
-
-        uint8[4] memory adaArr = [1, 3, 5, 7];
-
-
-
-    temp.winningNumbers=adaArr;
+        numbers[0]=2;
+        numbers[1]=4;
+        numbers[2]=6;
+        numbers[3]=8;
+        numbers[4]=10;
+        numbers[5]=11;
+        numbers[6]=13;
+        numbers[7]=15;
+        numbers[8]=17;
+        numbers[9]=20;
+        numbers[10]=22;
+        numbers[11]=24;
+        numbers[12]=26;
+        numbers[13]=28;
+        numbers[14]=29;
+        numbers[15]=31;
+        numbers[16]=33;
+        numbers[17]=35;
+        temp.winningNumbers = numbers;
         bets.push(temp);
+
+        payout(temp.owner, temp.winningAmount/4);
     }
     function betEven(uint amount) public {
         // TODO
