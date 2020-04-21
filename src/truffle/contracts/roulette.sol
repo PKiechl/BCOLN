@@ -41,8 +41,9 @@ contract roulette{
 
     function leave() public {
         // allows client to leave the game
-        require(clientCount>=1);
-        clientCount=clientCount-1;
+        if (clientCount >= 1) {
+            clientCount=clientCount-1;
+        }
     }
 
     function startup() payable public{
@@ -56,10 +57,8 @@ contract roulette{
         allReady();
     }
 
-    function get() public view returns (uint){
+    function getResult() public view returns (uint){
         // allows clients to get the results of a finished game
-        require (gameFinished);
-        // TODO
         return (lastRoundWinningNumber);
     }
 
@@ -109,10 +108,33 @@ contract roulette{
 //    ### BETS
     //https://livecasino.com/wp-content/uploads/2018/12/How-to-bet-on-roulette-Red.png
     // TODO: verify if these are all possible bets
-    function betRed(uint amount) public {
-        // TODO
-        //red: 1,3,5,7,9, 12, 14, 16, 18, 19,21, 23, 25, 27,30,32,34,36
 
+    function betRed() payable public {
+        require(!gameFinished);
+        bet memory temp;
+        temp.winningAmount =  msg.value*2;
+        temp.owner = msg.sender;
+        uint8[] memory numbers=new uint8[](18);
+        numbers[0]=1;
+        numbers[1]=3;
+        numbers[2]=5;
+        numbers[3]=7;
+        numbers[4]=9;
+        numbers[5]=12;
+        numbers[6]=14;
+        numbers[7]=16;
+        numbers[8]=18;
+        numbers[9]=19;
+        numbers[10]=21;
+        numbers[11]=23;
+        numbers[12]=25;
+        numbers[13]=27;
+        numbers[14]=30;
+        numbers[15]=32;
+        numbers[16]=34;
+        numbers[17]=36;
+        temp.winningNumbers = numbers;
+        bets.push(temp);
     }
 
     function betBlack() payable public {

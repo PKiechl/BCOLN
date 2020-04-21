@@ -8,7 +8,7 @@ import {
   Route,
   Link,
   useRouteMatch,
-  useParams
+  useParams,
 } from "react-router-dom";
 
 //RPC server from GANACHE,
@@ -25,115 +25,109 @@ class App extends React.Component {
 
   state = {
     winningNumber: null,
-    address: null
+    address: null,
+    url: null,
+    done: false,
+    amount: null
   };
 
-  callContractGet = async event => {
+  callContractGet = async (event) => {
     //todo for debugging purposes
     event.preventDefault();
-    const res = await TestContract.methods.get().call();
+    const res = await TestContract.methods.getResult().call();
     this.setState({ winningNumber: res });
   };
 
-  ///////////////////////////
-  //notes:
-  //jedesmal bim contract calle muess gas mitglieferd werde,
-  // solangs ned nur e get methode isch, dh. state modifiziert wird
-  //
-  //account für bank, dh de wo die contracts deployd muen für gas zueständig sii
-  //ein bestimmte account -> möglicherwiis accounts[0],
-  // im idealfall aber im contract selber ghandlet und ned im client->google
-
-  callContractSet = async amount => {
-    // const accounts = await web3.eth.getAccounts();
-    // const account = accounts[0];
-    const account = this.state.address;
-    // const res = await TestContract.methods.set(amount);
-    const res = await TestContract.methods.getRandomNumber();
-
-    const gas = await res.estimateGas();
-    const result = await res.send({ from: account, gasPrice: gas });
-    console.log(result);
-
-    //
-    //   const rNumber = await TestContract.methods.get().call();
-    //   console.log('rnumber',rNumber);
+  setAmount = async (amount) => {
+    const ammo = await this.setState({ amount: amount });
+    console.log(this.state.amount);
   };
 
-  callSetReady = async event => {
+  callSetReady = async (event) => {
     event.preventDefault();
     // const accounts = await web3.eth.getAccounts();
-    //todo: need to pick correct account, not sure how to do that
-    // const account = accounts[5];
     const account = this.state.address;
-
     const res = await TestContract.methods.setReady();
 
     const gas = await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("called ready", result);
   };
 
-  callBet = async amount => {
-    // const accounts = await web3.eth.getAccounts();
-    //todo: need to pick correct account, not sure how to do that
-
-    // const account = accounts[5];
-    // const res = await TestContract.methods.set(amount);
+  callBet = async (betType) => {
     const account = this.state.address;
-    const res = await TestContract.methods.betBlack();
+    console.log("betType", betType);
 
-    const gas = await res.estimateGas();
+    let res;
+    switch(betType){
+      case "red":
+        res = await TestContract.methods.betRed();
+        break;
+      case "black":
+        res = await TestContract.methods.betBlack();
+        break
+    }
+
     const result = await res.send({
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(amount, "ether")
+      value: web3.utils.toWei(this.state.amount.toString(), "ether"),
     });
-    console.log("bet called with: ", amount);
+    console.log("bet called with: ", this.state.amount);
   };
 
-  callJoin = async event => {
+  callJoin = async (event) => {
+    // note: leave/join paid by account zero
     event.preventDefault();
     const accounts = await web3.eth.getAccounts();
-    //todo: need to pick correct account, not sure how to do that
     const account = accounts[5];
     const res = await TestContract.methods.join();
-    const gas = await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("joined", result);
     let url = window.location.href;
-    window.location.href = url+"game";
+    window.location.href = url + "game";
   };
 
-  setAccountAddress = accAddress => {
-    this.setState({ address: accAddress });
+  callLeave = async () => {
+    // note: leave/join paid by account zero
+    const accounts = await web3.eth.getAccounts();
+    const account = accounts[0];
+    const res = await TestContract.methods.leave();
+    const result = await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000",
+    });
+    window.history.back();
+    console.log("leave/back");
+  };
+
+  setAccountAddress = async (accAddress) => {
+    const address = await this.setState({ address: accAddress });
     console.log("address set: ", this.state.address);
   };
 
   componentDidMount = async () => {
     const accounts = await web3.eth.getAccounts();
-    //todo: need to pick correct account, not sure how to do that
     const account = accounts[0];
     const balance = await web3.eth.getBalance(account);
     const eths = web3.utils.fromWei(balance.toString(), "ether");
-    // if(!web3.eth.getBalance(account)===100) {
-    console.log(eths);
     if (eths > 95) {
       const res = await TestContract.methods.startup();
       const result = await res.send({
         from: account,
         gasPrice: 2000,
         gasLimit: "500000",
-        value: web3.utils.toWei("95", "ether")
+        value: web3.utils.toWei("95", "ether"),
       });
     }
   };
@@ -145,7 +139,6 @@ class App extends React.Component {
         <div>
           <Switch>
             <Route exact path="/">
-
               <button className="ui button" onClick={this.callJoin}>
                 Join
               </button>
@@ -153,13 +146,22 @@ class App extends React.Component {
             <Route path="/game">
               <div className="ui container">
                 <h1 className="ui header">Roulette</h1>
+
                 <InputBar
-                  onFormSubmit={this.callBet}
+                  onFormSubmit={this.setAmount}
                   inputText={"enter amount"}
                 />
+
+                <button className="ui button" onClick={() => this.callBet("black")}>
+                  betBlack
+                </button>
+                <button className="ui button" onClick={() => this.callBet("red")}>
+                  betRed
+                </button>
+
                 <InputBar
-                    onFormSubmit={this.setAccountAddress}
-                    inputText={"enter address"}
+                  onFormSubmit={this.setAccountAddress}
+                  inputText={"enter address"}
                 />
 
                 <button className="ui button" onClick={this.callContractGet}>
@@ -167,6 +169,9 @@ class App extends React.Component {
                 </button>
                 <button className="ui button" onClick={this.callSetReady}>
                   Set Ready
+                </button>
+                <button className="ui button" onClick={this.callLeave}>
+                  back
                 </button>
 
                 <div className="ui message">
