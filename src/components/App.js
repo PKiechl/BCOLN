@@ -8,8 +8,10 @@ import {
   Route,
   Link,
   useRouteMatch,
-  useParams,
+  useParams
 } from "react-router-dom";
+import JoinPage from "./JoinPage";
+import Bets from "./Bets";
 
 //RPC server from GANACHE,
 const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
@@ -31,19 +33,19 @@ class App extends React.Component {
     amount: null
   };
 
-  callContractGet = async (event) => {
+  callContractGet = async event => {
     //todo for debugging purposes
     event.preventDefault();
     const res = await TestContract.methods.getResult().call();
     this.setState({ winningNumber: res });
   };
 
-  setAmount = async (amount) => {
+  setAmount = async amount => {
     const ammo = await this.setState({ amount: amount });
     console.log(this.state.amount);
   };
 
-  callSetReady = async (event) => {
+  callSetReady = async event => {
     event.preventDefault();
     // const accounts = await web3.eth.getAccounts();
     const account = this.state.address;
@@ -53,48 +55,52 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("called ready", result);
   };
 
-  callBet = async (betType) => {
+  callBet = async betType => {
     const account = this.state.address;
     console.log("betType", betType);
+    console.log("address", account);
 
     let res;
-    switch(betType){
+    switch (betType) {
       case "red":
         res = await TestContract.methods.betRed();
         break;
       case "black":
         res = await TestContract.methods.betBlack();
-        break
+        break;
     }
 
     const result = await res.send({
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(this.state.amount.toString(), "ether"),
+      value: web3.utils.toWei(this.state.amount.toString(), "ether")
     });
     console.log("bet called with: ", this.state.amount);
   };
 
-  callJoin = async (event) => {
+  callJoin = async event => {
     // note: leave/join paid by account zero
-    event.preventDefault();
+    // event.preventDefault();
+    console.log("event: ", event);
     const accounts = await web3.eth.getAccounts();
     const account = accounts[5];
     const res = await TestContract.methods.join();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("joined", result);
     let url = window.location.href;
     window.location.href = url + "game";
+    const w = await this.setState({ address: event });
+    console.log("address: ", this.state.address);
   };
 
   callLeave = async () => {
@@ -105,16 +111,16 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     window.history.back();
     console.log("leave/back");
   };
 
-  setAccountAddress = async (accAddress) => {
-    const address = await this.setState({ address: accAddress });
-    console.log("address set: ", this.state.address);
-  };
+  // setAccountAddress = async (accAddress) => {
+  //   const address = await this.setState({ address: accAddress });
+  //   console.log("address set: ", this.state.address);
+  // };
 
   componentDidMount = async () => {
     const accounts = await web3.eth.getAccounts();
@@ -127,10 +133,17 @@ class App extends React.Component {
         from: account,
         gasPrice: 2000,
         gasLimit: "500000",
-        value: web3.utils.toWei("95", "ether"),
+        value: web3.utils.toWei("95", "ether")
       });
     }
+    let data = JSON.parse(localStorage.getItem("address"));
+    const d = await this.setState({ address: data.address });
+    console.log("address in state", this.state.address);
   };
+
+  componentWillUpdate(nextProps, nextState) {
+    localStorage.setItem("address", JSON.stringify(nextState));
+  }
 
   render() {
     //renders the InputBar, where the bet amount is entered and returned back to this component
@@ -139,9 +152,7 @@ class App extends React.Component {
         <div>
           <Switch>
             <Route exact path="/">
-              <button className="ui button" onClick={this.callJoin}>
-                Join
-              </button>
+              <JoinPage onSubmit={this.callJoin} />
             </Route>
             <Route path="/game">
               <div className="ui container">
@@ -151,33 +162,21 @@ class App extends React.Component {
                   onFormSubmit={this.setAmount}
                   inputText={"enter amount"}
                 />
-
-                <button className="ui button" onClick={() => this.callBet("black")}>
-                  betBlack
-                </button>
-                <button className="ui button" onClick={() => this.callBet("red")}>
-                  betRed
-                </button>
-
-                <InputBar
-                  onFormSubmit={this.setAccountAddress}
-                  inputText={"enter address"}
-                />
-
-                <button className="ui button" onClick={this.callContractGet}>
-                  Get random number
-                </button>
-                <button className="ui button" onClick={this.callSetReady}>
-                  Set Ready
-                </button>
-                <button className="ui button" onClick={this.callLeave}>
-                  back
-                </button>
+                <Bets onClick={this.callBet} />
 
                 <div className="ui message">
                   <div className="header">Winning Number</div>
                   <p>{this.state.winningNumber}</p>
                 </div>
+                <button className="ui button" onClick={this.callSetReady}>
+                  Set Ready
+                </button>
+                <button className="ui button" onClick={this.callContractGet}>
+                  Get random number
+                </button>
+                <button className="ui button" onClick={this.callLeave}>
+                  back
+                </button>
               </div>
             </Route>
           </Switch>
