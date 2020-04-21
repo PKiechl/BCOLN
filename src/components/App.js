@@ -29,7 +29,9 @@ class App extends React.Component {
     winningNumber: null,
     address: null,
     url: null,
-    done: false,
+    // done: false,
+    bet: false,
+    ready: false,
     amount: null
   };
 
@@ -58,6 +60,8 @@ class App extends React.Component {
       gasLimit: "500000"
     });
     console.log("called ready", result);
+    this.setState({ ready: true });
+    this.setState({ bet: false });
   };
 
   callBet = async betType => {
@@ -82,6 +86,7 @@ class App extends React.Component {
       value: web3.utils.toWei(this.state.amount.toString(), "ether")
     });
     console.log("bet called with: ", this.state.amount);
+    this.setState({ bet: true });
   };
 
   callJoin = async event => {
@@ -116,11 +121,6 @@ class App extends React.Component {
     window.history.back();
     console.log("leave/back");
   };
-
-  // setAccountAddress = async (accAddress) => {
-  //   const address = await this.setState({ address: accAddress });
-  //   console.log("address set: ", this.state.address);
-  // };
 
   componentDidMount = async () => {
     const accounts = await web3.eth.getAccounts();
@@ -161,20 +161,36 @@ class App extends React.Component {
                 <InputBar
                   onFormSubmit={this.setAmount}
                   inputText={"enter amount"}
+                  disabled={this.state.ready}
                 />
-                <Bets onClick={this.callBet} />
+                <Bets
+                  onClick={this.callBet}
+                  disabled={!this.state.amount || this.state.ready}
+                />
 
                 <div className="ui message">
                   <div className="header">Winning Number</div>
                   <p>{this.state.winningNumber}</p>
                 </div>
-                <button className="ui button" onClick={this.callSetReady}>
+                <button
+                  className="ui button"
+                  disabled={!this.state.bet || this.state.ready}
+                  onClick={this.callSetReady}
+                >
                   Set Ready
                 </button>
-                <button className="ui button" onClick={this.callContractGet}>
+                <button
+                  className="ui button"
+                  disabled={!this.state.ready}
+                  onClick={this.callContractGet}
+                >
                   Get random number
                 </button>
-                <button className="ui button" onClick={this.callLeave}>
+                <button
+                  className="ui button"
+                  disabled={this.state.bet}
+                  onClick={this.callLeave}
+                >
                   back
                 </button>
               </div>

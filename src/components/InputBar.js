@@ -26,7 +26,9 @@ class InputBar extends React.Component {
             value={this.state.amount}
             onChange={this.onInputChange}
           />
-          <button className="ui button">Confirm</button>
+          <button className="ui button" disabled={this.props.disabled}>
+            Confirm
+          </button>
         </form>
       </div>
     );

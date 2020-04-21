@@ -6,13 +6,21 @@ class Bets extends React.Component {
   };
 
   render() {
-      //TODO: add more buttons here
+    //TODO: add more bet buttons here
     return (
       <div>
-        <button className="ui button" onClick={() => this.onSubmit("black")}>
+        <button
+          className="ui button"
+          disabled={this.props.disabled}
+          onClick={() => this.onSubmit("black")}
+        >
           betBlack
         </button>
-        <button className="ui button" onClick={() => this.onSubmit("red")}>
+        <button
+          className="ui button"
+          disabled={this.props.disabled}
+          onClick={() => this.onSubmit("red")}
+        >
           betRed
         </button>
       </div>
