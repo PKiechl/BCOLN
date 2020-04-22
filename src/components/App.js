@@ -61,7 +61,7 @@ class App extends React.Component {
     this.getAccountBalance();
   };
 
-  callBet = async betType => {
+  callBet = async (betType, nr1,nr2,nr3,nr4) => {
     const account = this.state.address;
     console.log("betType", betType);
     console.log("address", account);
@@ -74,6 +74,8 @@ class App extends React.Component {
       case "black":
         res = await TestContract.methods.betBlack();
         break;
+      case "multi":
+
     }
 
     await res.send({
