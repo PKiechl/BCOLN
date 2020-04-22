@@ -2,16 +2,12 @@ import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
 import data from "../truffle/build/contracts/roulette.json";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useRouteMatch,
-  useParams
-} from "react-router-dom";
+import { BrowserRouter, Route, withRouter } from "react-router-dom";
 import JoinPage from "./JoinPage";
 import Bets from "./Bets";
+import RouletteWheel from "./RouletteWheel";
+import Header from "./Header";
+import Balance from "./Balance";
 
 //RPC server from GANACHE,
 const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
@@ -29,27 +25,27 @@ class App extends React.Component {
     winningNumber: null,
     address: null,
     url: null,
-    // done: false,
+    eths: 0,
     bet: false,
     ready: false,
     amount: null
   };
 
   callContractGet = async event => {
-    //todo for debugging purposes
     event.preventDefault();
     const res = await TestContract.methods.getResult().call();
     this.setState({ winningNumber: res });
+    //TODO idea: route to /anim or something to play the roulette animation?
+
   };
 
   setAmount = async amount => {
-    const ammo = await this.setState({ amount: amount });
+    await this.setState({ amount: amount });
     console.log(this.state.amount);
   };
 
   callSetReady = async event => {
     event.preventDefault();
-    // const accounts = await web3.eth.getAccounts();
     const account = this.state.address;
     const res = await TestContract.methods.setReady();
 
@@ -62,6 +58,7 @@ class App extends React.Component {
     console.log("called ready", result);
     this.setState({ ready: true });
     this.setState({ bet: false });
+    this.getAccountBalance();
   };
 
   callBet = async betType => {
@@ -79,7 +76,7 @@ class App extends React.Component {
         break;
     }
 
-    const result = await res.send({
+    await res.send({
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
@@ -91,10 +88,9 @@ class App extends React.Component {
 
   callJoin = async event => {
     // note: leave/join paid by account zero
-    // event.preventDefault();
     console.log("event: ", event);
     const accounts = await web3.eth.getAccounts();
-    const account = accounts[5];
+    const account = accounts[0];
     const res = await TestContract.methods.join();
     const result = await res.send({
       from: account,
@@ -102,18 +98,18 @@ class App extends React.Component {
       gasLimit: "500000"
     });
     console.log("joined", result);
-    let url = window.location.href;
-    window.location.href = url + "game";
-    const w = await this.setState({ address: event });
+
+    await this.setState({ address: event });
     console.log("address: ", this.state.address);
+    this.getAccountBalance();
   };
 
   callLeave = async () => {
-    // note: leave/join paid by account zero
+    // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
     const res = await TestContract.methods.leave();
-    const result = await res.send({
+    await res.send({
       from: account,
       gasPrice: 2000,
       gasLimit: "500000"
@@ -123,6 +119,7 @@ class App extends React.Component {
   };
 
   componentDidMount = async () => {
+    //send funds to Account 0, that acts as the bank
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
     const balance = await web3.eth.getBalance(account);
@@ -136,68 +133,74 @@ class App extends React.Component {
         value: web3.utils.toWei("95", "ether")
       });
     }
-    let data = JSON.parse(localStorage.getItem("address"));
-    const d = await this.setState({ address: data.address });
-    console.log("address in state", this.state.address);
   };
 
-  componentWillUpdate(nextProps, nextState) {
-    localStorage.setItem("address", JSON.stringify(nextState));
-  }
+  getAccountBalance = async () => {
+    if (this.state.address) {
+      const balance = await web3.eth.getBalance(this.state.address);
+      const eths = await web3.utils.fromWei(balance.toString(), "ether");
+      await this.setState({ eths: eths });
+      console.log("eths", this.state.eths);
+    }
+  };
 
   render() {
     //renders the InputBar, where the bet amount is entered and returned back to this component
+
     return (
-      <Router>
-        <div>
-          <Switch>
+      <div className="ui container">
+        <BrowserRouter>
+          <div>
+            <Header />
             <Route exact path="/">
               <JoinPage onSubmit={this.callJoin} />
             </Route>
-            <Route path="/game">
-              <div className="ui container">
-                <h1 className="ui header">Roulette</h1>
+            <Route exact path="/game">
+              <Balance eths={this.state.eths} address={this.state.address} />
+              <InputBar
+                onFormSubmit={this.setAmount}
+                inputText={
+                  "enter amount. todo: change to wei? only eth's are supported right now"
+                }
+                disabled={this.state.ready}
+              />
+              <Bets
+                onClick={this.callBet}
+                disabled={!this.state.amount || this.state.ready}
+              />
 
-                <InputBar
-                  onFormSubmit={this.setAmount}
-                  inputText={"enter amount"}
-                  disabled={this.state.ready}
-                />
-                <Bets
-                  onClick={this.callBet}
-                  disabled={!this.state.amount || this.state.ready}
-                />
-
-                <div className="ui message">
-                  <div className="header">Winning Number</div>
-                  <p>{this.state.winningNumber}</p>
-                </div>
-                <button
-                  className="ui button"
-                  disabled={!this.state.bet || this.state.ready}
-                  onClick={this.callSetReady}
-                >
-                  Set Ready
-                </button>
-                <button
-                  className="ui button"
-                  disabled={!this.state.ready}
-                  onClick={this.callContractGet}
-                >
-                  Get random number
-                </button>
-                <button
-                  className="ui button"
-                  disabled={this.state.bet}
-                  onClick={this.callLeave}
-                >
-                  back
-                </button>
+              <div className="ui message">
+                <div className="header">Winning Number</div>
+                <p>{this.state.winningNumber}</p>
               </div>
+              <button
+                className="ui button"
+                disabled={!this.state.bet || this.state.ready}
+                onClick={this.callSetReady}
+              >
+                Set Ready
+              </button>
+              <button
+                className="ui button"
+                disabled={!this.state.ready}
+                onClick={this.callContractGet}
+              >
+                Get random number
+              </button>
+              <button
+                className="ui button"
+                disabled={this.state.bet}
+                onClick={this.callLeave}
+              >
+                back
+              </button>
             </Route>
-          </Switch>
-        </div>
-      </Router>
+            <Route exact path="/game/anim">
+              <RouletteWheel number={this.state.winningNumber} />
+            </Route>
+          </div>
+        </BrowserRouter>
+      </div>
     );
   }
 }
