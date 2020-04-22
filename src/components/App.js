@@ -24,27 +24,25 @@ class App extends React.Component {
   state = {
     winningNumber: null,
     address: null,
-    url: null,
     eths: 0,
     bet: false,
     ready: false,
-    amount: null
+    amount: null,
   };
 
-  callContractGet = async event => {
+  callContractGet = async (event) => {
     event.preventDefault();
     const res = await TestContract.methods.getResult().call();
     this.setState({ winningNumber: res });
     //TODO idea: route to /anim or something to play the roulette animation?
-
   };
 
-  setAmount = async amount => {
+  setAmount = async (amount) => {
     await this.setState({ amount: amount });
     console.log(this.state.amount);
   };
 
-  callSetReady = async event => {
+  callSetReady = async (event) => {
     event.preventDefault();
     const account = this.state.address;
     const res = await TestContract.methods.setReady();
@@ -53,7 +51,7 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("called ready", result);
     this.setState({ ready: true });
@@ -61,34 +59,43 @@ class App extends React.Component {
     this.getAccountBalance();
   };
 
-  callBet = async (betType, nr1,nr2,nr3,nr4) => {
+  callBet = async (betType, nr1, nr2, nr3, nr4) => {
     const account = this.state.address;
     console.log("betType", betType);
     console.log("address", account);
 
     let res;
     switch (betType) {
+      // TODO: the numbers bets currently are tied to betRed. change once implemented
       case "red":
         res = await TestContract.methods.betRed();
         break;
       case "black":
         res = await TestContract.methods.betBlack();
         break;
-      case "multi":
-
+      case "1num":
+        res = await TestContract.methods.betRed();
+        break;
+      case "2combo":
+        res = await TestContract.methods.betRed();
+        break;
+      case "4combo":
+        res = await TestContract.methods.betRed();
+        break;
     }
+    console.log("betType:", betType, "numbers(optional):", nr1, nr2, nr3, nr4);
 
     await res.send({
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(this.state.amount.toString(), "ether")
+      value: web3.utils.toWei(this.state.amount.toString(), "ether"),
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
   };
 
-  callJoin = async event => {
+  callJoin = async (event) => {
     // note: leave/join paid by account zero
     console.log("event: ", event);
     const accounts = await web3.eth.getAccounts();
@@ -97,7 +104,7 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("joined", result);
 
@@ -114,8 +121,13 @@ class App extends React.Component {
     await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
+    // TODO: this might have to move somewhere other
+    this.setState({ ready: false });
+    this.setState({ bet: false });
+    this.setState({ amount: null });
+
     window.history.back();
     console.log("leave/back");
   };
@@ -132,7 +144,7 @@ class App extends React.Component {
         from: account,
         gasPrice: 2000,
         gasLimit: "500000",
-        value: web3.utils.toWei("95", "ether")
+        value: web3.utils.toWei("95", "ether"),
       });
     }
   };
