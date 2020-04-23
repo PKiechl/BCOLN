@@ -80,7 +80,7 @@ class App extends React.Component {
         res = await TestContract.methods.betSplit(nr1, nr2);
         break;
       case "4combo":
-        res = await TestContract.methods.betRed();
+        res = await TestContract.methods.betComboFour(nr1, nr2, nr3, nr4);
         break;
     }
     console.log("betType:", betType, "numbers(optional):", nr1, nr2, nr3, nr4);

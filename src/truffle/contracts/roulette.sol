@@ -208,8 +208,14 @@ contract roulette{
         createBet(numbers, 18);
     }
 
-    function betComboFour(uint number, uint number2, uint number3, uint number4, uint amount) public {
-        // TODO
+    function betComboFour(uint8 number1, uint8 number2, uint8 number3, uint8 number4) payable public {
+        // TODO: add 'require' that numbers are adjacent (or solve it through graphical constraint)
+        uint8[] memory numbers=new uint8[](4);
+        numbers[0] = number1;
+        numbers[1] = number2;
+        numbers[2] = number3;
+        numbers[3] = number4;
+        createBet(numbers, 9);
     }
 
 
