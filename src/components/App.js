@@ -8,6 +8,7 @@ import Bets from "./Bets";
 import RouletteWheel from "./RouletteWheel";
 import Header from "./Header";
 import Balance from "./Balance";
+import SubmittedBets from "./SubmittedBets";
 
 //RPC server from GANACHE,
 const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
@@ -28,6 +29,7 @@ class App extends React.Component {
     bet: false,
     ready: false,
     amount: null,
+    bets: [],
   };
 
   callContractGet = async (event) => {
@@ -93,6 +95,10 @@ class App extends React.Component {
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
+
+    this.setState(prevState => ({
+      bets: [...prevState.bets, betType]
+    }))
   };
 
   callJoin = async (event) => {
@@ -182,7 +188,9 @@ class App extends React.Component {
                 onClick={this.callBet}
                 disabled={!this.state.amount || this.state.ready}
               />
-
+              <SubmittedBets
+                bets={this.state.bets}
+              />
               <div className="ui message">
                 <div className="header">Winning Number</div>
                 <p>{this.state.winningNumber}</p>
