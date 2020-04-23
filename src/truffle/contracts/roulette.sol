@@ -198,9 +198,16 @@ contract roulette{
         numbers[0] = number;
         createBet(numbers, 36);
     }
-    function betComboTwo(uint number, uint number2, uint amount) public {
-        // TODO
+
+    // A bet on two numbers which are adjacent on the table, made by placing the chip on the shared line of the two numbers’ squares.
+    function betSplit(uint8 number1, uint8 number2) payable public {
+        // TODO: add 'require' that numbers are adjacent (or solve it through graphical constraint)
+        uint8[] memory numbers=new uint8[](2);
+        numbers[0] = number1;
+        numbers[1] = number2;
+        createBet(numbers, 18);
     }
+
     function betComboFour(uint number, uint number2, uint number3, uint number4, uint amount) public {
         // TODO
     }
