@@ -104,16 +104,20 @@ contract roulette{
         gameFinished=false;
     }
 
+    function createBet(uint8[] memory winningNumbers, uint8 payoutFactor) private {
+        require(!gameFinished);
+        bet memory temp;
+        temp.winningAmount =  msg.value*payoutFactor;
+        temp.owner = msg.sender;
+        temp.winningNumbers = winningNumbers;
+        bets.push(temp);
+    }
 
 //    ### BETS
     //https://livecasino.com/wp-content/uploads/2018/12/How-to-bet-on-roulette-Red.png
     // TODO: verify if these are all possible bets
 
     function betRed() payable public {
-        require(!gameFinished);
-        bet memory temp;
-        temp.winningAmount =  msg.value*2;
-        temp.owner = msg.sender;
         uint8[] memory numbers=new uint8[](18);
         numbers[0]=1;
         numbers[1]=3;
@@ -133,15 +137,10 @@ contract roulette{
         numbers[15]=32;
         numbers[16]=34;
         numbers[17]=36;
-        temp.winningNumbers = numbers;
-        bets.push(temp);
+        createBet(numbers, 2);
     }
 
     function betBlack() payable public {
-        require(!gameFinished);
-        bet memory temp;
-        temp.winningAmount =  msg.value*2;
-        temp.owner = msg.sender;
         uint8[] memory numbers=new uint8[](18);
         numbers[0]=2;
         numbers[1]=4;
@@ -161,8 +160,7 @@ contract roulette{
         numbers[15]=31;
         numbers[16]=33;
         numbers[17]=35;
-        temp.winningNumbers = numbers;
-        bets.push(temp);
+        createBet(numbers, 2);
     }
 
     function betEven(uint amount) public {
@@ -196,14 +194,9 @@ contract roulette{
         // TODO
     }
     function betNumber(uint8 number) payable public {
-        require(!gameFinished);
-        bet memory temp;
-        temp.winningAmount =  msg.value*36;
-        temp.owner = msg.sender;
         uint8[] memory numbers=new uint8[](1);
         numbers[0] = number;
-        temp.winningNumbers = numbers;
-        bets.push(temp);
+        createBet(numbers, 36);
     }
     function betComboTwo(uint number, uint number2, uint amount) public {
         // TODO
