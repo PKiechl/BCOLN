@@ -11,7 +11,18 @@ class SubmittedBets extends React.Component {
                 <h3 className="ui header">Submitted Bets</h3>
                 <ul className="ui list">
                     {bets.map((value, index) => {
-                        return <li key={index}>{value}</li>
+                        let numbers = [];
+                        for (let num of value.numbers) {
+                            if (num != null){
+                                numbers.push(num);
+                            }
+                        }
+                        numbers = numbers.join(", ");
+                        if (numbers !== ""){
+                            numbers = `, Numbers: ${numbers}`
+                        }
+
+                        return <li key={index}>Bet type: {value.betType}, Amount: {value.amount}{numbers}</li>
                     })}
                 </ul>
             </div>

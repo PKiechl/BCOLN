@@ -97,7 +97,7 @@ class App extends React.Component {
     this.setState({ bet: true });
 
     this.setState(prevState => ({
-      bets: [...prevState.bets, betType]
+      bets: [...prevState.bets, {"betType": betType, "amount": this.state.amount, "numbers": [nr1, nr2, nr3, nr4]}]
     }))
   };
 
