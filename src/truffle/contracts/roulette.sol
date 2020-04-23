@@ -195,8 +195,15 @@ contract roulette{
     function betCol3(uint amount) public {
         // TODO
     }
-    function betNumber(uint number, uint amount) public {
-        // TODO
+    function betNumber(uint8 number) payable public {
+        require(!gameFinished);
+        bet memory temp;
+        temp.winningAmount =  msg.value*36;
+        temp.owner = msg.sender;
+        uint8[] memory numbers=new uint8[](1);
+        numbers[0] = number;
+        temp.winningNumbers = numbers;
+        bets.push(temp);
     }
     function betComboTwo(uint number, uint number2, uint amount) public {
         // TODO

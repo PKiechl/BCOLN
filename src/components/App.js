@@ -74,7 +74,7 @@ class App extends React.Component {
         res = await TestContract.methods.betBlack();
         break;
       case "1num":
-        res = await TestContract.methods.betRed();
+        res = await TestContract.methods.betNumber(nr1);
         break;
       case "2combo":
         res = await TestContract.methods.betRed();
