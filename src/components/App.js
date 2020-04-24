@@ -140,25 +140,17 @@ class App extends React.Component {
   };
 
   replayRoulette = async () => {
-    const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
-    const res = await TestContract.methods.leave();
-    await res.send({
-      from: account,
-      gasPrice: 2000,
-      gasLimit: "500000",
-    });
-
-    this.setState({ ready: false });
-    this.setState({ bet: false });
-    this.setState({ amount: "" });
-    this.setState({ bets: [] });
-    this.setState({ winningNumber: null });
-
+    await this.resetRouletteState();
     this.callJoin(this.state.address);
   };
 
   callLeave = async () => {
+    await this.resetRouletteState();
+    window.history.back();
+    console.log("leave/back");
+  };
+
+  async resetRouletteState() {
     // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
@@ -169,14 +161,12 @@ class App extends React.Component {
       gasLimit: "500000",
     });
     // TODO: this might have to move somewhere other
-    this.setState({ ready: false });
-    this.setState({ bet: false });
-    this.setState({ amount: "" });
-    this.setState({ bets: [] });
-
-    window.history.back();
-    console.log("leave/back");
-  };
+    this.setState({ready: false});
+    this.setState({bet: false});
+    this.setState({amount: ""});
+    this.setState({bets: []});
+    this.setState({ winningNumber: null });
+  }
 
   componentDidMount = async () => {
     //send funds to Account 0, that acts as the bank
