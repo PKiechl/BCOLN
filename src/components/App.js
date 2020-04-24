@@ -139,6 +139,25 @@ class App extends React.Component {
     this.setState({bet: false});
   };
 
+  replayRoulette = async () => {
+    const accounts = await web3.eth.getAccounts();
+    const account = accounts[0];
+    const res = await TestContract.methods.leave();
+    await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000",
+    });
+
+    this.setState({ ready: false });
+    this.setState({ bet: false });
+    this.setState({ amount: "" });
+    this.setState({ bets: [] });
+    this.setState({ winningNumber: null });
+
+    this.callJoin(this.state.address);
+  };
+
   callLeave = async () => {
     // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
@@ -235,6 +254,13 @@ class App extends React.Component {
                 onClick={this.resetCurrentBetState}
               >
                 Place another bet
+              </button>
+              <button
+                className="ui button"
+                disabled={!this.state.ready}
+                onClick={this.replayRoulette}
+              >
+                Replay roulette
               </button>
               <button
                 className="ui button"
