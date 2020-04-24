@@ -2,7 +2,7 @@ import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
 import data from "../truffle/build/contracts/roulette.json";
-import { BrowserRouter, Route, withRouter } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 import JoinPage from "./JoinPage";
 import Bets from "./Bets";
 import RouletteWheel from "./RouletteWheel";
@@ -48,8 +48,7 @@ class App extends React.Component {
     event.preventDefault();
     const account = this.state.address;
     const res = await TestContract.methods.setReady();
-
-    const gas = await res.estimateGas();
+    await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
@@ -96,9 +95,16 @@ class App extends React.Component {
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
 
-    this.setState(prevState => ({
-      bets: [...prevState.bets, {"betType": betType, "amount": this.state.amount, "numbers": [nr1, nr2, nr3, nr4]}]
-    }))
+    this.setState((prevState) => ({
+      bets: [
+        ...prevState.bets,
+        {
+          betType: betType,
+          amount: this.state.amount,
+          numbers: [nr1, nr2, nr3, nr4],
+        },
+      ],
+    }));
   };
 
   callJoin = async (event) => {
@@ -133,6 +139,7 @@ class App extends React.Component {
     this.setState({ ready: false });
     this.setState({ bet: false });
     this.setState({ amount: null });
+    this.setState({ bets: [] });
 
     window.history.back();
     console.log("leave/back");
@@ -146,7 +153,7 @@ class App extends React.Component {
     const eths = web3.utils.fromWei(balance.toString(), "ether");
     if (eths > 95) {
       const res = await TestContract.methods.startup();
-      const result = await res.send({
+      await res.send({
         from: account,
         gasPrice: 2000,
         gasLimit: "500000",
@@ -188,9 +195,7 @@ class App extends React.Component {
                 onClick={this.callBet}
                 disabled={!this.state.amount || this.state.ready}
               />
-              <SubmittedBets
-                bets={this.state.bets}
-              />
+              <SubmittedBets bets={this.state.bets} />
               <div className="ui message">
                 <div className="header">Winning Number</div>
                 <p>{this.state.winningNumber}</p>
