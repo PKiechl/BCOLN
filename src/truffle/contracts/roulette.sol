@@ -185,9 +185,22 @@ contract roulette{
         }
         createBet(numbers, 2);
     }
-    function betFirstDozen(uint amount) public {
-        // TODO
+
+    function betDozen(uint8 start) private {
+        uint8 end = start + 12;
+        uint8[] memory numbers = new uint8[](12);
+        uint8 counter = 0;
+        for (uint8 i = start; i < end; i++) {
+            numbers[counter] = i;
+            counter++;
+        }
+        createBet(numbers, 3);
     }
+
+    function betFirstDozen() payable public {
+        betDozen(1);
+    }
+
     function betSecondDozen(uint amount) public {
         // TODO
     }
