@@ -163,8 +163,16 @@ contract roulette{
         createBet(numbers, 2);
     }
 
-    function betEven(uint amount) public {
-        // TODO
+    function betEven() payable public {
+        uint8[] memory numbers = new uint8[](19);
+        uint8 counter = 0;
+        for (uint8 i = 0; i < 37; i++) {
+            if (i % 2 == 0){
+                numbers[counter] = i;
+                counter++;
+            }
+        }
+        createBet(numbers, 2);
     }
     function betOdd(uint amount) public {
         // TODO
