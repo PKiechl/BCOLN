@@ -26,9 +26,11 @@ class App extends React.Component {
     winningNumber: null,
     address: null,
     eths: 0,
+    // bet: -> bet has been placed
     bet: false,
+    // ready: -> player done placing bets
     ready: false,
-    amount: null,
+    amount: "",
     bets: [],
   };
 
@@ -94,7 +96,7 @@ class App extends React.Component {
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
-
+    let cnt = this.state.betCounter +1;
     this.setState((prevState) => ({
       bets: [
         ...prevState.bets,
@@ -125,6 +127,12 @@ class App extends React.Component {
     this.getAccountBalance();
   };
 
+  resetCurrentBetState = () => {
+    // resets amount and bet booleans to allow placement of another bet
+    this.setState({amount: ""});
+    this.setState({bet: false});
+  };
+
   callLeave = async () => {
     // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
@@ -138,7 +146,7 @@ class App extends React.Component {
     // TODO: this might have to move somewhere other
     this.setState({ ready: false });
     this.setState({ bet: false });
-    this.setState({ amount: null });
+    this.setState({ amount: "" });
     this.setState({ bets: [] });
 
     window.history.back();
@@ -186,6 +194,7 @@ class App extends React.Component {
               <Balance eths={this.state.eths} address={this.state.address} />
               <InputBar
                 onFormSubmit={this.setAmount}
+                // val = {this.state.amount}
                 inputText={
                   "enter amount. todo: change to wei? only eth's are supported right now"
                 }
@@ -193,7 +202,7 @@ class App extends React.Component {
               />
               <Bets
                 onClick={this.callBet}
-                disabled={!this.state.amount || this.state.ready}
+                disabled={this.state.amount === ""|| this.state.ready || this.state.bet}
               />
               <SubmittedBets bets={this.state.bets} />
               <div className="ui message">
@@ -213,6 +222,13 @@ class App extends React.Component {
                 onClick={this.callContractGet}
               >
                 Get random number
+              </button>
+              <button
+                className="ui button"
+                disabled={!this.state.bet}
+                onClick={this.resetCurrentBetState}
+              >
+                Place another bet
               </button>
               <button
                 className="ui button"

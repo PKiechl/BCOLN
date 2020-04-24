@@ -35,4 +35,33 @@ class InputBar extends React.Component {
   }
 }
 
+
+// // TODO: NOTE: experimented with a functional component version but screws with alot
+// const InputBar = (props) => {
+//
+//   const onInputChange = event => {
+//     //sets the entered amount into the state
+//     let temp = event.target.value;
+//     // NOTE: not sure what it means when he says props.onFormSubmit not resolved,
+//     //  it works after all...
+//     //  same for props.inputText on line 18
+//     props.onFormSubmit(temp);
+//   };
+//
+//   return (
+//     <div className="search bar ui segment">
+//       <form
+//         className="ui form">
+//         <label> {props.inputText} </label>
+//         <input
+//           type="text"
+//           value={props.val}
+//           onChange={onInputChange}
+//         />
+//       </form>
+//     </div>
+//   );
+// };
+
+
 export default InputBar;

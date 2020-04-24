@@ -3,7 +3,7 @@ import NumberField from "./NumberField";
 
 class Bets extends React.Component {
   state = {
-    multi: null,
+    type: null,
     nr1: "",
     nr2: "",
     nr3: "",
@@ -31,34 +31,49 @@ class Bets extends React.Component {
       this.state.nr4
     );
 
-    await this.props.onClick(
-      type,
-      this.state.nr1,
-      this.state.nr2,
-      this.state.nr3,
-      this.state.nr4
-    );
+    if(this.validateNumbers()) {
+      await this.props.onClick(
+        type,
+        this.state.nr1,
+        this.state.nr2,
+        this.state.nr3,
+        this.state.nr4
+      );
+      // bet successful TODO: might need better checking
+      this.resetState();
+    }
+  };
+
+  resetState = async () => {
+    // reset state to properly change the ui for consecutive bets when using
+    // place another bet in App.js
+    await this.setState({type: null});
+    await this.setState({nr1: ""});
+    await this.setState({nr2: ""});
+    await this.setState({nr3: ""});
+    await this.setState({nr4: ""});
+    await this.setState({ready: false});
   };
 
   numberCountCheck = () => {
-    console.log("numerical bet type:", this.state.multi);
+    console.log("numerical bet type:", this.state.type);
     // check if the necessary amount of numbers per betType are set
     // also checks upon changing betType and resets ready state if needed
-    if (this.state.multi === "1num") {
+    if (this.state.type === "1num") {
       if (this.state.nr1 !== "") {
         this.setState({ ready: true });
       } else {
         this.setState({ ready: false });
       }
     }
-    if (this.state.multi === "2combo") {
+    if (this.state.type === "2combo") {
       if (this.state.nr1 !== "" && this.state.nr2 !== "") {
         this.setState({ ready: true });
       } else {
         this.setState({ ready: false });
       }
     }
-    if (this.state.multi === "4combo") {
+    if (this.state.type === "4combo") {
       if (
         this.state.nr1 !== "" &&
         this.state.nr2 !== "" &&
@@ -70,6 +85,72 @@ class Bets extends React.Component {
         this.setState({ ready: false });
       }
     }
+  };
+
+  singleNumCheck = () => {
+    // check validity of a simple numerical bet
+    if (this.state.type === "1num") {
+      if (this.state.nr1 < 0 || this.state.nr1 > 36) {
+        alert("Invalid Number entered. Please enter a numbers from 0 to 36!");
+        this.setState({nr1: ""});
+        return false;
+      }
+    }
+    return true;
+  };
+
+  twoComboCheck = () => {
+    // check validity of a 2 combo numerical bet
+    if (this.state.type === "2combo") {
+      // individual validity checks
+      if (this.state.nr1 > 36 || this.state.nr1 < 1) {
+        alert("Please enter a number between 1 and 36 for your first number!");
+        this.setState({nr1: ""});
+        return false;
+      }
+      if (this.state.nr2 > 36 || this.state.nr2 < 1) {
+        alert("Please enter a number between 1 and 36 for your second number!");
+        this.setState({nr2: ""});
+        return false;
+      }
+      // TODO: valid combo logic... would require actual roulette field in UI
+      //  otherwise how is the user to know which combos are valid
+    }
+    return true;
+  };
+
+  fourComboCheck = () => {
+    if (this.state.type === "4combo") {
+      // individual validity checks
+      if (this.state.nr1 > 36 || this.state.nr1 < 1) {
+        alert("Please enter a number between 1 and 36 for your first number!");
+        this.setState({nr1: ""});
+        return false;
+      }
+      if (this.state.nr2 > 36 || this.state.nr2 < 1) {
+        alert("Please enter a number between 1 and 36 for your second number!");
+        this.setState({nr2: ""});
+        return false;
+      }
+      if (this.state.nr3 > 36 || this.state.nr3 < 1) {
+        alert("Please enter a number between 1 and 36 for your third number!");
+        this.setState({nr3: ""});
+        return false;
+      }
+      if (this.state.nr4 > 36 || this.state.nr4 < 1) {
+        alert("Please enter a number between 1 and 36 for your fourth number!");
+        this.setState({nr4: ""});
+        return false;
+      }
+    }
+    // TODO: valid combo logic... would require actual roulette field in UI
+    //  otherwise how is the user to know which combos are valid
+    return true;
+  };
+
+  validateNumbers = () => {
+    // checks if numerical bets adhere to the rules of the game
+    return this.singleNumCheck() && this.twoComboCheck() && this.fourComboCheck();
   };
 
   receiver = async (id, num) => {
@@ -92,7 +173,7 @@ class Bets extends React.Component {
     //TODO: add more bet buttons here
 
     let numField = null;
-    if (this.state.multi === "4combo") {
+    if (this.state.type === "4combo") {
       numField = (
         <div>
           <div>
@@ -129,7 +210,7 @@ class Bets extends React.Component {
         </div>
       );
     }
-    if (this.state.multi === "2combo") {
+    if (this.state.type === "2combo") {
       numField = (
         <div>
           <div>
@@ -156,7 +237,7 @@ class Bets extends React.Component {
         </div>
       );
     }
-    if (this.state.multi === "1num") {
+    if (this.state.type === "1num") {
       numField = (
         <div>
           <div>
@@ -199,7 +280,7 @@ class Bets extends React.Component {
           className="ui button"
           disabled={this.props.disabled}
           onClick={async () => {
-            await this.setState({ multi: "1num" });
+            await this.setState({ type: "1num" });
             this.numberCountCheck();
           }}
         >
@@ -209,7 +290,7 @@ class Bets extends React.Component {
           className="ui button"
           disabled={this.props.disabled}
           onClick={async () => {
-            await this.setState({ multi: "2combo" });
+            await this.setState({ type: "2combo" });
             this.numberCountCheck();
           }}
         >
@@ -219,7 +300,7 @@ class Bets extends React.Component {
           className="ui button"
           disabled={this.props.disabled}
           onClick={async () => {
-            await this.setState({ multi: "4combo" });
+            await this.setState({ type: "4combo" });
             this.numberCountCheck();
           }}
         >
