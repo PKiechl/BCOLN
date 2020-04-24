@@ -85,6 +85,12 @@ class App extends React.Component {
       case "firstDozen":
         res = await TestContract.methods.betFirstDozen();
         break;
+      case "secondDozen":
+        res = await TestContract.methods.betSecondDozen();
+        break;
+      case "thirdDozen":
+        res = await TestContract.methods.betThirdDozen();
+        break;
       case "1num":
         res = await TestContract.methods.betNumber(nr1);
         break;

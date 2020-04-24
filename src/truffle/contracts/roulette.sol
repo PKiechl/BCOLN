@@ -201,12 +201,14 @@ contract roulette{
         betDozen(1);
     }
 
-    function betSecondDozen(uint amount) public {
-        // TODO
+    function betSecondDozen() payable public {
+        betDozen(13);
     }
-    function betThirdDozen(uint amount) public {
-        // TODO
+
+    function betThirdDozen() payable public {
+        betDozen(25);
     }
+
     function bet1to18(uint amount) public {
         // TODO
     }
