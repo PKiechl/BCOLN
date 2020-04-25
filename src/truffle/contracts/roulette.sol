@@ -163,29 +163,6 @@ contract roulette{
         createBet(numbers, 2);
     }
 
-    function betEven() payable public {
-        uint8[] memory numbers = new uint8[](19);
-        uint8 counter = 0;
-        for (uint8 i = 0; i < 37; i++) {
-            if (i % 2 == 0){
-                numbers[counter] = i;
-                counter++;
-            }
-        }
-        createBet(numbers, 2);
-    }
-    function betOdd() payable public {
-        uint8[] memory numbers = new uint8[](18);
-        uint8 counter = 0;
-        for (uint8 i = 0; i < 37; i++) {
-            if (i % 2 == 1){
-                numbers[counter] = i;
-                counter++;
-            }
-        }
-        createBet(numbers, 2);
-    }
-
     function betRange(uint8 start, uint8 number_count, uint8 payoutFactor) private {
         uint8 end = start + number_count;
         uint8[] memory numbers = new uint8[](number_count);
@@ -216,26 +193,34 @@ contract roulette{
         betRange(19, 18, 2);
     }
 
-    function betModulo(uint8 remainder) public {
-        uint8[] memory numbers = new uint8[](12);
+    function betModulo(uint8 remainder, uint8 divisor) public {
+        uint8[] memory numbers = new uint8[](36/divisor);
         uint8 counter = 0;
         for (uint8 i = 1; i < 37; i++) {
-            if (i % 3 == remainder){
+            if (i % divisor == remainder){
                 numbers[counter] = i;
                 counter++;
             }
         }
-        createBet(numbers, 3);
+        createBet(numbers, divisor);
     }
 
+    function betEven() payable public {
+        betModulo(0, 2);
+    }
+    function betOdd() payable public {
+        betModulo(1, 2);
+    }
+
+
     function betCol1() payable public {
-        betModulo(1);
+        betModulo(1, 3);
     }
     function betCol2() payable public {
-        betModulo(2);
+        betModulo(2, 3);
     }
     function betCol3() payable public {
-        betModulo(0);
+        betModulo(0, 3);
     }
 
     function betNumber(uint8 number) payable public {
