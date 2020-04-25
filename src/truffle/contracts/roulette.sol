@@ -215,15 +215,29 @@ contract roulette{
     function bet19to36() payable public {
         betRange(19, 18, 2);
     }
-    function betCol1(uint amount) public {
-        // TODO
+
+    function betModulo(uint8 remainder) public {
+        uint8[] memory numbers = new uint8[](12);
+        uint8 counter = 0;
+        for (uint8 i = 1; i < 37; i++) {
+            if (i % 3 == remainder){
+                numbers[counter] = i;
+                counter++;
+            }
+        }
+        createBet(numbers, 3);
     }
-    function betCol2(uint amount) public {
-        // TODO
+
+    function betCol1() payable public {
+        betModulo(1);
     }
-    function betCol3(uint amount) public {
-        // TODO
+    function betCol2() payable public {
+        betModulo(2);
     }
+    function betCol3() payable public {
+        betModulo(0);
+    }
+
     function betNumber(uint8 number) payable public {
         uint8[] memory numbers=new uint8[](1);
         numbers[0] = number;
