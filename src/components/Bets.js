@@ -314,6 +314,20 @@ class Bets extends React.Component {
         <button
           className="ui button"
           disabled={this.props.disabled}
+          onClick={() => this.onSubmit("1to18")}
+        >
+          bet1to18
+        </button>
+        <button
+          className="ui button"
+          disabled={this.props.disabled}
+          onClick={() => this.onSubmit("19to36")}
+        >
+          bet19to36
+        </button>
+        <button
+          className="ui button"
+          disabled={this.props.disabled}
           onClick={async () => {
             await this.setState({ type: "1num" });
             this.numberCountCheck();

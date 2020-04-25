@@ -186,34 +186,34 @@ contract roulette{
         createBet(numbers, 2);
     }
 
-    function betDozen(uint8 start) private {
-        uint8 end = start + 12;
-        uint8[] memory numbers = new uint8[](12);
+    function betRange(uint8 start, uint8 number_count, uint8 payoutFactor) private {
+        uint8 end = start + number_count;
+        uint8[] memory numbers = new uint8[](number_count);
         uint8 counter = 0;
         for (uint8 i = start; i < end; i++) {
             numbers[counter] = i;
             counter++;
         }
-        createBet(numbers, 3);
+        createBet(numbers, payoutFactor);
     }
 
     function betFirstDozen() payable public {
-        betDozen(1);
+        betRange(1, 12, 3);
     }
 
     function betSecondDozen() payable public {
-        betDozen(13);
+        betRange(13, 12, 3);
     }
 
     function betThirdDozen() payable public {
-        betDozen(25);
+        betRange(25, 12, 3);
     }
 
-    function bet1to18(uint amount) public {
-        // TODO
+    function bet1to18() payable public {
+        betRange(1, 18, 2);
     }
-    function bet19to36(uint amount) public {
-        // TODO
+    function bet19to36() payable public {
+        betRange(19, 18, 2);
     }
     function betCol1(uint amount) public {
         // TODO
