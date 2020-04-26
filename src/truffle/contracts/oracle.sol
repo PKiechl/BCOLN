@@ -39,7 +39,6 @@ contract Oracle is usingOraclize{
         urng=bytesToUInt(rng);
         //for some reason number is too big, just modulo it.
          return urng%37;
-//        return str;
     }
 
 //    function __callback(bytes32 myId, string memory result){

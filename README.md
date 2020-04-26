@@ -1,3 +1,13 @@
+Zum laufe la:
+
+1. Ganache Quickstart drücke
+2. ethereum-bridge -H localhost:7545 --broadcast -a 0 --dev
+ -> Y -> 0 -> Y und wenn fertig
+3. truffle migrate
+4. npm start
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Truffle

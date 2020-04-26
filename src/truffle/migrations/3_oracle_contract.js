@@ -1,7 +1,5 @@
 var OracleContract = artifacts.require("Oracle");
 var RouletteContract = artifacts.require("./roulette.sol");
-// var web3 = require("web3");
-// import Web3 from "./././web3";
 const Web3 = require("web3");
 
 // module.exports = function(deployer) {
@@ -24,7 +22,7 @@ module.exports = async function(deployer, network, accounts) {
   await deployer.deploy(RouletteContract, OracleContract.address, {
     from: accounts[0],
     gas: 6721975,
-    value: 50000000000000000000
+    value: 90000000000000000000
   });
 };
 

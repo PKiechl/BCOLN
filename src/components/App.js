@@ -167,19 +167,19 @@ class App extends React.Component {
     }
   };
 
-  generateRandomNumber = async()=>{
-    const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
-    const res = await TestContract.methods.getRandomNumber();
-    await res.send({
-      from: account,
-      gasPrice: 2000,
-      gasLimit: "6000000",
-    });
-    const res2 = await TestContract.methods.getRandomNumbe2().call();
-    console.log("rng: ",res2)
-
-  }
+  // generateRandomNumber = async()=>{
+  //   const accounts = await web3.eth.getAccounts();
+  //   const account = accounts[0];
+  //   const res = await TestContract.methods.getRandomNumber();
+  //   await res.send({
+  //     from: account,
+  //     gasPrice: 2000,
+  //     gasLimit: "6000000",
+  //   });
+  //   const res2 = await TestContract.methods.getRandomNumbe2().call();
+  //   console.log("rng: ",res2)
+  //
+  // }
 
 
   render() {
@@ -233,12 +233,6 @@ class App extends React.Component {
                 onClick={this.callLeave}
               >
                 back
-              </button>
-              <button
-                  className="ui button"
-                  onClick={this.generateRandomNumber}
-              >
-                rng
               </button>
             </Route>
 
