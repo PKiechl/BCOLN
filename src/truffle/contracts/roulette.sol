@@ -161,36 +161,66 @@ contract roulette{
         createBet(numbers, 2);
     }
 
-    function betEven(uint amount) public {
-        // TODO
+    function betRange(uint8 start, uint8 number_count, uint8 payoutFactor) private {
+        uint8 end = start + number_count;
+        uint8[] memory numbers = new uint8[](number_count);
+        uint8 counter = 0;
+        for (uint8 i = start; i < end; i++) {
+            numbers[counter] = i;
+            counter++;
+        }
+        createBet(numbers, payoutFactor);
     }
-    function betOdd(uint amount) public {
-        // TODO
+
+    function betFirstDozen() payable public {
+        betRange(1, 12, 3);
     }
-    function betFirstDozen(uint amount) public {
-        // TODO
+
+    function betSecondDozen() payable public {
+        betRange(13, 12, 3);
     }
-    function betSecondDozen(uint amount) public {
-        // TODO
+
+    function betThirdDozen() payable public {
+        betRange(25, 12, 3);
     }
-    function betThirdDozen(uint amount) public {
-        // TODO
+
+    function bet1to18() payable public {
+        betRange(1, 18, 2);
     }
-    function bet1to18(uint amount) public {
-        // TODO
+    function bet19to36() payable public {
+        betRange(19, 18, 2);
     }
-    function bet19to36(uint amount) public {
-        // TODO
+
+    function betModulo(uint8 remainder, uint8 divisor) public {
+        uint8[] memory numbers = new uint8[](36/divisor);
+        uint8 counter = 0;
+        for (uint8 i = 1; i < 37; i++) {
+            if (i % divisor == remainder){
+                numbers[counter] = i;
+                counter++;
+            }
+        }
+        createBet(numbers, divisor);
     }
-    function betCol1(uint amount) public {
-        // TODO
+
+    function betEven() payable public {
+        betModulo(0, 2);
     }
-    function betCol2(uint amount) public {
-        // TODO
+    function betOdd() payable public {
+        betModulo(1, 2);
     }
-    function betCol3(uint amount) public {
-        // TODO
+
+
+    function betCol1() payable public {
+        betModulo(1, 3);
     }
+    function betCol2() payable public {
+        betModulo(2, 3);
+    }
+    function betCol3() payable public {
+        betModulo(0, 3);
+    }
+
     function betNumber(uint8 number) payable public {
         uint8[] memory numbers=new uint8[](1);
         numbers[0] = number;

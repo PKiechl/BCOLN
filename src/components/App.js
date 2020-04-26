@@ -2,7 +2,7 @@ import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
 import data from "../truffle/build/contracts/roulette.json";
-import { BrowserRouter, Route, withRouter } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 import JoinPage from "./JoinPage";
 import Bets from "./Bets";
 import RouletteWheel from "./RouletteWheel";
@@ -26,9 +26,11 @@ class App extends React.Component {
     winningNumber: null,
     address: null,
     eths: 0,
+    // bet: -> bet has been placed
     bet: false,
+    // ready: -> player done placing bets
     ready: false,
-    amount: null,
+    amount: "",
     bets: [],
   };
 
@@ -49,8 +51,7 @@ class App extends React.Component {
     event.preventDefault();
     const account = this.state.address;
     const res = await TestContract.methods.setReady();
-
-    const gas = await res.estimateGas();
+    await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
@@ -76,6 +77,36 @@ class App extends React.Component {
       case "black":
         res = await TestContract.methods.betBlack();
         break;
+      case "even":
+        res = await TestContract.methods.betEven();
+        break;
+      case "odd":
+        res = await TestContract.methods.betOdd();
+        break;
+      case "firstDozen":
+        res = await TestContract.methods.betFirstDozen();
+        break;
+      case "secondDozen":
+        res = await TestContract.methods.betSecondDozen();
+        break;
+      case "thirdDozen":
+        res = await TestContract.methods.betThirdDozen();
+        break;
+      case "1to18":
+        res = await TestContract.methods.bet1to18();
+        break;
+      case "19to36":
+        res = await TestContract.methods.bet19to36();
+        break;
+      case "col1":
+        res = await TestContract.methods.betCol1();
+        break;
+      case "col2":
+        res = await TestContract.methods.betCol2();
+        break;
+      case "col3":
+        res = await TestContract.methods.betCol3();
+        break;
       case "1num":
         res = await TestContract.methods.betNumber(nr1);
         break;
@@ -96,10 +127,17 @@ class App extends React.Component {
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
-
-    this.setState(prevState => ({
-      bets: [...prevState.bets, {"betType": betType, "amount": this.state.amount, "numbers": [nr1, nr2, nr3, nr4]}]
-    }))
+    let cnt = this.state.betCounter +1;
+    this.setState((prevState) => ({
+      bets: [
+        ...prevState.bets,
+        {
+          betType: betType,
+          amount: this.state.amount,
+          numbers: [nr1, nr2, nr3, nr4],
+        },
+      ],
+    }));
   };
 
   callJoin = async (event) => {
@@ -120,7 +158,24 @@ class App extends React.Component {
     this.getAccountBalance();
   };
 
+  resetCurrentBetState = () => {
+    // resets amount and bet booleans to allow placement of another bet
+    this.setState({amount: ""});
+    this.setState({bet: false});
+  };
+
+  replayRoulette = async () => {
+    await this.resetRouletteState();
+    this.callJoin(this.state.address);
+  };
+
   callLeave = async () => {
+    await this.resetRouletteState();
+    window.history.back();
+    console.log("leave/back");
+  };
+
+  async resetRouletteState() {
     // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
@@ -131,32 +186,13 @@ class App extends React.Component {
       gasLimit: "500000",
     });
     // TODO: this might have to move somewhere other
-    this.setState({ ready: false });
-    this.setState({ bet: false });
-    this.setState({ amount: null });
-    this.setState({ bets: [] });
+    this.setState({ready: false});
+    this.setState({bet: false});
+    this.setState({amount: ""});
+    this.setState({bets: []});
+    this.setState({ winningNumber: null });
+  }
 
-
-    window.history.back();
-    console.log("leave/back");
-  };
-
-  // componentDidMount = async () => {
-    //send funds to Account 0, that acts as the bank
-    // const accounts = await web3.eth.getAccounts();
-    // const account = accounts[0];
-    // const balance = await web3.eth.getBalance(account);
-    // const eths = web3.utils.fromWei(balance.toString(), "ether");
-    // if (eths > 95) {
-    //   const res = await TestContract.methods.startup();
-    //   const result = await res.send({
-    //     from: account,
-    //     gasPrice: 2000,
-    //     gasLimit: "500000",
-    //     value: web3.utils.toWei("95", "ether"),
-    //   });
-    // }
-  // };
 
   getAccountBalance = async () => {
     if (this.state.address) {
@@ -166,20 +202,6 @@ class App extends React.Component {
       console.log("eths", this.state.eths);
     }
   };
-
-  // generateRandomNumber = async()=>{
-  //   const accounts = await web3.eth.getAccounts();
-  //   const account = accounts[0];
-  //   const res = await TestContract.methods.getRandomNumber();
-  //   await res.send({
-  //     from: account,
-  //     gasPrice: 2000,
-  //     gasLimit: "6000000",
-  //   });
-  //   const res2 = await TestContract.methods.getRandomNumbe2().call();
-  //   console.log("rng: ",res2)
-  //
-  // }
 
 
   render() {
@@ -197,6 +219,7 @@ class App extends React.Component {
               <Balance eths={this.state.eths} address={this.state.address} />
               <InputBar
                 onFormSubmit={this.setAmount}
+                // val = {this.state.amount}
                 inputText={
                   "enter amount. todo: change to wei? only eth's are supported right now"
                 }
@@ -204,11 +227,9 @@ class App extends React.Component {
               />
               <Bets
                 onClick={this.callBet}
-                disabled={!this.state.amount || this.state.ready}
+                disabled={this.state.amount === ""|| this.state.ready || this.state.bet}
               />
-              <SubmittedBets
-                bets={this.state.bets}
-              />
+              <SubmittedBets bets={this.state.bets} />
               <div className="ui message">
                 <div className="header">Winning Number</div>
                 <p>{this.state.winningNumber}</p>
@@ -226,6 +247,20 @@ class App extends React.Component {
                 onClick={this.callContractGet}
               >
                 Get random number
+              </button>
+              <button
+                className="ui button"
+                disabled={!this.state.bet}
+                onClick={this.resetCurrentBetState}
+              >
+                Place another bet
+              </button>
+              <button
+                className="ui button"
+                disabled={!this.state.ready}
+                onClick={this.replayRoulette}
+              >
+                Replay roulette
               </button>
               <button
                 className="ui button"

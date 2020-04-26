@@ -13,7 +13,7 @@ class SubmittedBets extends React.Component {
                     {bets.map((value, index) => {
                         let numbers = [];
                         for (let num of value.numbers) {
-                            if (num != null){
+                            if (num !== ""){
                                 numbers.push(num);
                             }
                         }
