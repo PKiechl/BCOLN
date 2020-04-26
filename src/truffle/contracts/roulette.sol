@@ -22,7 +22,11 @@ contract roulette{
     uint256 randomNumber;
     uint256 lastRoundWinningNumber;
     address payable oracleAddress;
+    bool started=false;
 
+    //#################### EVENTS ##################################################################################
+    event LogSpinningWheel(string desc, address client);
+    event RouletteDone(address client, uint rng);
 
     //#################### CONSTRUCTOR #################################################################################
     constructor(address payable _oracleAddress) payable public {
@@ -62,20 +66,32 @@ contract roulette{
     //### GAME MANAGEMENT
     function allReady() private {
         if (readyCount == clientCount) {
-            playRoulette();
+//            playRoulette();
+            createRandomNumber();
         }
     }
 
-    function getRandomNumber()public{
+    function createRandomNumber()public{
         gameFinished=true;
-        randomNumber=oracle.generateRandomNumber();
+        oracle.generateRandomNumber();
+//        playRoulette();
     }
 
+    function getRandomNumber()public{
+        randomNumber=oracle.getRandomNumber();
 
-    function playRoulette() private {
-        getRandomNumber();
-        evaluate();
-        teardown();
+    }
+
+    function playRoulette() public {
+        //todo test race conditions
+        //but it seems to work with multiple clients.
+        if(!started){
+            started=true;
+            emit LogSpinningWheel("started playing roulette", msg.sender);
+            getRandomNumber();
+            evaluate();
+            teardown();
+        }
     }
 
     function evaluate() private {
@@ -100,6 +116,8 @@ contract roulette{
         delete randomNumber;
         delete bets;
         gameFinished=false;
+        started=false;
+        emit RouletteDone(msg.sender, lastRoundWinningNumber);
     }
 
     function createBet(uint8[] memory winningNumbers, uint8 payoutFactor) private {

@@ -1,11 +1,34 @@
-Zum laufe la:
+To run Project:
 
-1. Ganache Quickstart drücke
-2. ethereum-bridge -H localhost:7545 --broadcast -a 0 --dev
- -> Y -> 0 -> Y und wenn fertig
-3. truffle migrate
-4. npm start
+##Run with Ethereum Bridge
+https://github.com/provable-things/ethereum-bridge
 
+Install ethereum-bridge:
+```shell script
+npm install -g ethereum-bridge
+```
+
+
+1 
+Ganache Quickstart
+
+2 
+```shell script
+ethereum-bridge -H localhost:7545 --broadcast -a 0 --dev
+```
+when it asks: y then 0 then y
+
+3 
+```
+truffle migrate
+```
+
+4 
+```
+npm start
+```
+
+That's it.
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

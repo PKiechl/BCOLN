@@ -2,28 +2,31 @@ import React from "react";
 import InputBar from "./InputBar";
 import Web3 from "web3";
 import data from "../truffle/build/contracts/roulette.json";
+import oracleData from "../truffle/build/contracts/Oracle.json";
 import { BrowserRouter, Route } from "react-router-dom";
 import JoinPage from "./JoinPage";
 import Bets from "./Bets";
-import RouletteWheel from "./RouletteWheel";
 import Header from "./Header";
 import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
 
 //RPC server from GANACHE,
-const web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));
+const web3 = new Web3("ws://127.0.0.1:7545");
 web3.eth.defaultAccount = web3.eth.accounts[0];
 
 let abi = data.abi;
 let contract_address = data.networks[5777].address;
+let oracleAbi = oracleData.abi;
+let oracle_address = oracleData.networks[5777].address;
 
-const TestContract = new web3.eth.Contract(abi, contract_address);
+const RouletteContract = new web3.eth.Contract(abi, contract_address);
+const OracleContract = new web3.eth.Contract(oracleAbi, oracle_address);
 
 class App extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
   state = {
-    winningNumber: null,
+    winningNumber: "",
     address: null,
     eths: 0,
     // bet: -> bet has been placed
@@ -31,31 +34,73 @@ class App extends React.Component {
     // ready: -> player done placing bets
     ready: false,
     amount: "",
-    bets: [],
+    bets: []
   };
+  constructor(props) {
+    super(props);
+    this.watchEvents(OracleContract);
+    this.watchEvents(RouletteContract);
+  }
 
-  callContractGet = async (event) => {
-    event.preventDefault();
-    const res = await TestContract.methods.getResult().call();
+  async watchEvents(contract) {
+    contract.events.allEvents(
+      {
+        fromBlock: "latest"
+      },
+      (error, event) => {
+        if (error) {
+          console.error("error while waiting for events");
+          return;
+        }
+        console.log(
+          "event arrived.",
+          event.event,
+          event.returnValues.client,
+          event.returnValues.desc
+        );
+        if (event.event === "LogQueryDone") {
+          this.callPlay();
+        }
+        if (event.event === "RouletteDone") {
+          this.setState({ winningNumber: event.returnValues.rng });
+          this.getAccountBalance();
+        }
+      }
+    );
+  }
 
-    this.setState({ winningNumber: res });
-    //TODO idea: route to /anim or something to play the roulette animation?
-  };
-
-  setAmount = async (amount) => {
-    await this.setState({ amount: amount });
-    console.log(this.state.amount);
-  };
-
-  callSetReady = async (event) => {
-    event.preventDefault();
+  callPlay = async event => {
     const account = this.state.address;
-    const res = await TestContract.methods.setReady();
+    const res = await RouletteContract.methods.playRoulette();
     await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
+    });
+    console.log("called play", result);
+  };
+
+  // callContractGet = async event => {
+  //   event.preventDefault();
+  //   const res = await RouletteContract.methods.getResult().call();
+  //   this.setState({ winningNumber: res });
+  // };
+
+  setAmount = async amount => {
+    await this.setState({ amount: amount });
+    console.log(this.state.amount);
+  };
+
+  callSetReady = async event => {
+    event.preventDefault();
+    const account = this.state.address;
+    const res = await RouletteContract.methods.setReady();
+    await res.estimateGas();
+    const result = await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000"
     });
     console.log("called ready", result);
     this.setState({ ready: true });
@@ -70,51 +115,50 @@ class App extends React.Component {
 
     let res;
     switch (betType) {
-      // TODO: the numbers bets currently are tied to betRed. change once implemented
       case "red":
-        res = await TestContract.methods.betRed();
+        res = await RouletteContract.methods.betRed();
         break;
       case "black":
-        res = await TestContract.methods.betBlack();
+        res = await RouletteContract.methods.betBlack();
         break;
       case "even":
-        res = await TestContract.methods.betEven();
+        res = await RouletteContract.methods.betEven();
         break;
       case "odd":
-        res = await TestContract.methods.betOdd();
+        res = await RouletteContract.methods.betOdd();
         break;
       case "firstDozen":
-        res = await TestContract.methods.betFirstDozen();
+        res = await RouletteContract.methods.betFirstDozen();
         break;
       case "secondDozen":
-        res = await TestContract.methods.betSecondDozen();
+        res = await RouletteContract.methods.betSecondDozen();
         break;
       case "thirdDozen":
-        res = await TestContract.methods.betThirdDozen();
+        res = await RouletteContract.methods.betThirdDozen();
         break;
       case "1to18":
-        res = await TestContract.methods.bet1to18();
+        res = await RouletteContract.methods.bet1to18();
         break;
       case "19to36":
-        res = await TestContract.methods.bet19to36();
+        res = await RouletteContract.methods.bet19to36();
         break;
       case "col1":
-        res = await TestContract.methods.betCol1();
+        res = await RouletteContract.methods.betCol1();
         break;
       case "col2":
-        res = await TestContract.methods.betCol2();
+        res = await RouletteContract.methods.betCol2();
         break;
       case "col3":
-        res = await TestContract.methods.betCol3();
+        res = await RouletteContract.methods.betCol3();
         break;
       case "1num":
-        res = await TestContract.methods.betNumber(nr1);
+        res = await RouletteContract.methods.betNumber(nr1);
         break;
       case "2combo":
-        res = await TestContract.methods.betSplit(nr1, nr2);
+        res = await RouletteContract.methods.betSplit(nr1, nr2);
         break;
       case "4combo":
-        res = await TestContract.methods.betComboFour(nr1, nr2, nr3, nr4);
+        res = await RouletteContract.methods.betComboFour(nr1, nr2, nr3, nr4);
         break;
     }
     console.log("betType:", betType, "numbers(optional):", nr1, nr2, nr3, nr4);
@@ -123,33 +167,33 @@ class App extends React.Component {
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(this.state.amount.toString(), "ether"),
+      value: web3.utils.toWei(this.state.amount.toString(), "ether")
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
-    let cnt = this.state.betCounter +1;
-    this.setState((prevState) => ({
+    let cnt = this.state.betCounter + 1;
+    this.setState(prevState => ({
       bets: [
         ...prevState.bets,
         {
           betType: betType,
           amount: this.state.amount,
-          numbers: [nr1, nr2, nr3, nr4],
-        },
-      ],
+          numbers: [nr1, nr2, nr3, nr4]
+        }
+      ]
     }));
+    this.getAccountBalance();
   };
 
-  callJoin = async (event) => {
+  callJoin = async event => {
     // note: leave/join paid by account zero
-    console.log("event: ", event);
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
-    const res = await TestContract.methods.join();
+    const res = await RouletteContract.methods.join();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("joined", result);
 
@@ -160,8 +204,8 @@ class App extends React.Component {
 
   resetCurrentBetState = () => {
     // resets amount and bet booleans to allow placement of another bet
-    this.setState({amount: ""});
-    this.setState({bet: false});
+    this.setState({ amount: "" });
+    this.setState({ bet: false });
   };
 
   replayRoulette = async () => {
@@ -179,20 +223,19 @@ class App extends React.Component {
     // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
-    const res = await TestContract.methods.leave();
+    const res = await RouletteContract.methods.leave();
     await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     // TODO: this might have to move somewhere other
-    this.setState({ready: false});
-    this.setState({bet: false});
-    this.setState({amount: ""});
-    this.setState({bets: []});
-    this.setState({ winningNumber: null });
+    this.setState({ ready: false });
+    this.setState({ bet: false });
+    this.setState({ amount: "" });
+    this.setState({ bets: [] });
+    this.setState({ winningNumber: "" });
   }
-
 
   getAccountBalance = async () => {
     if (this.state.address) {
@@ -203,10 +246,7 @@ class App extends React.Component {
     }
   };
 
-
   render() {
-    //renders the InputBar, where the bet amount is entered and returned back to this component
-
     return (
       <div className="ui container">
         <BrowserRouter>
@@ -220,14 +260,14 @@ class App extends React.Component {
               <InputBar
                 onFormSubmit={this.setAmount}
                 // val = {this.state.amount}
-                inputText={
-                  "enter amount. todo: change to wei? only eth's are supported right now"
-                }
-                disabled={this.state.ready}
+                inputText={"enter ether amount to bet"}
+                disabled={this.state.ready || this.state.bet}
               />
               <Bets
                 onClick={this.callBet}
-                disabled={this.state.amount === ""|| this.state.ready || this.state.bet}
+                disabled={
+                  this.state.amount === "" || this.state.ready || this.state.bet
+                }
               />
               <SubmittedBets bets={this.state.bets} />
               <div className="ui message">
@@ -241,13 +281,13 @@ class App extends React.Component {
               >
                 Set Ready
               </button>
-              <button
-                className="ui button"
-                disabled={!this.state.ready}
-                onClick={this.callContractGet}
-              >
-                Get random number
-              </button>
+              {/*<button*/}
+              {/*  className="ui button"*/}
+              {/*  disabled={!this.state.ready}*/}
+              {/*  onClick={this.callContractGet}*/}
+              {/*>*/}
+              {/*  Get random number*/}
+              {/*</button>*/}
               <button
                 className="ui button"
                 disabled={!this.state.bet}
@@ -270,7 +310,6 @@ class App extends React.Component {
                 back
               </button>
             </Route>
-
           </div>
         </BrowserRouter>
       </div>
