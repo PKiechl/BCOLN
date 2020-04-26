@@ -35,6 +35,7 @@ class App extends React.Component {
   callContractGet = async (event) => {
     event.preventDefault();
     const res = await TestContract.methods.getResult().call();
+
     this.setState({ winningNumber: res });
     //TODO idea: route to /anim or something to play the roulette animation?
   };
@@ -133,27 +134,29 @@ class App extends React.Component {
     this.setState({ ready: false });
     this.setState({ bet: false });
     this.setState({ amount: null });
+    this.setState({ bets: [] });
+
 
     window.history.back();
     console.log("leave/back");
   };
 
-  componentDidMount = async () => {
+  // componentDidMount = async () => {
     //send funds to Account 0, that acts as the bank
-    const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
-    const balance = await web3.eth.getBalance(account);
-    const eths = web3.utils.fromWei(balance.toString(), "ether");
-    if (eths > 95) {
-      const res = await TestContract.methods.startup();
-      const result = await res.send({
-        from: account,
-        gasPrice: 2000,
-        gasLimit: "500000",
-        value: web3.utils.toWei("95", "ether"),
-      });
-    }
-  };
+    // const accounts = await web3.eth.getAccounts();
+    // const account = accounts[0];
+    // const balance = await web3.eth.getBalance(account);
+    // const eths = web3.utils.fromWei(balance.toString(), "ether");
+    // if (eths > 95) {
+    //   const res = await TestContract.methods.startup();
+    //   const result = await res.send({
+    //     from: account,
+    //     gasPrice: 2000,
+    //     gasLimit: "500000",
+    //     value: web3.utils.toWei("95", "ether"),
+    //   });
+    // }
+  // };
 
   getAccountBalance = async () => {
     if (this.state.address) {
@@ -163,6 +166,21 @@ class App extends React.Component {
       console.log("eths", this.state.eths);
     }
   };
+
+  generateRandomNumber = async()=>{
+    const accounts = await web3.eth.getAccounts();
+    const account = accounts[0];
+    const res = await TestContract.methods.getRandomNumber();
+    await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "6000000",
+    });
+    const res2 = await TestContract.methods.getRandomNumbe2().call();
+    console.log("rng: ",res2)
+
+  }
+
 
   render() {
     //renders the InputBar, where the bet amount is entered and returned back to this component
@@ -216,10 +234,14 @@ class App extends React.Component {
               >
                 back
               </button>
+              <button
+                  className="ui button"
+                  onClick={this.generateRandomNumber}
+              >
+                rng
+              </button>
             </Route>
-            <Route exact path="/game/anim">
-              <RouletteWheel number={this.state.winningNumber} />
-            </Route>
+
           </div>
         </BrowserRouter>
       </div>

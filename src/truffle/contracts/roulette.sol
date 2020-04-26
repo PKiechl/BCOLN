@@ -21,15 +21,17 @@ contract roulette{
     Oracle oracle;
     uint256 randomNumber;
     uint256 lastRoundWinningNumber;
+    address payable oracleAddress;
 
 
     //#################### CONSTRUCTOR #################################################################################
-    constructor(address _oracleAddress) payable public {
+    constructor(address payable _oracleAddress) payable public {
         oracle = Oracle(_oracleAddress);
         readyCount = 0;
         clientCount = 0;
         gameFinished = false;
-
+        oracleAddress = _oracleAddress;
+//        _oracleAddress.transfer(5);
     }
 
     //#################### METHODS #####################################################################################
@@ -37,6 +39,8 @@ contract roulette{
     function join() public {
         // allows client to enter the game
         clientCount=clientCount+1;
+//        oracleAddress.transfer(1 ether);
+
     }
 
     function leave() public {
@@ -49,6 +53,7 @@ contract roulette{
     function startup() payable public{
         //TODO: don't touch it:)
         //startup function, such that ethers get sent to the contract after it's deployed.
+//        oracleAddress.transfer(5 ether);
     }
 
     function setReady() public {
@@ -73,6 +78,9 @@ contract roulette{
         gameFinished=true;
         randomNumber=oracle.generateRandomNumber();
     }
+//    function getRandomNumbe2()public view returns(uint256){
+//            return randomNumber;
+//    }
 
     function playRoulette() private {
         getRandomNumber();
