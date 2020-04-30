@@ -5,6 +5,8 @@ const RouletteWheel = props => {
   const items = ['Apple', 'Banana', 'Cherry'];
   const colors = ['#F76156', '#FBD1A2', '#BED558'];
 
+  showRoulletteWheel();
+
   return (
       <div>
           <div id="controls">
@@ -16,7 +18,6 @@ const RouletteWheel = props => {
               </div>
 
               <ul>
-                  <li><a href="#" onClick={showRoulletteWheel}>Show wheel</a></li>
                   <li><a href="#" onClick={throwBall}>Throw ball</a></li>
                   <li><a href="#" onClick={takeBall}>Take Ball</a></li>
               </ul>
