@@ -614,27 +614,6 @@ var rouletteSpinner = {
 };
 
 
-function showRoulletteWheel() {
-	setTimeout(function(){
-		rouletteSpinner.init();
-	}, 1000);
-}
-
-function toggleRoulletteWheel() {
-	roulette.sa = 0;
-	ball.sa = 0.94*360.0;
-	rouletteSpinner.doRollBall();
-	rouletteSpinner.doTogglePause();
-}
-
-function throwBall() {
-	rouletteSpinner.doRollBall();
-}
-
-function takeBall() {
-	rouletteSpinner.doTakeBall()
-}
-
 var numberMapping = {
 	0: 30,
 	0.03: 11,
@@ -676,10 +655,33 @@ var numberMapping = {
 	0.96:26,
 };
 
+const backNumberMapping = {};
+
+for (const i in numberMapping) {
+	let val = numberMapping[i];
+	backNumberMapping[val] = i;
+}
 
 
-export {rouletteSpinner}
+function showRoulletteWheel() {
+	setTimeout(function(){
+		rouletteSpinner.init();
+	}, 1000);
+}
+
+function throwBall() {
+	roulette.sa = 0;
+	ball.sa = 0.94*360.0;
+	rouletteSpinner.doRollBall();
+	rouletteSpinner.doTogglePause();
+}
+
+function takeBall() {
+	rouletteSpinner.doTakeBall()
+}
+
+
+
 export {showRoulletteWheel}
-export {toggleRoulletteWheel}
 export {throwBall}
 export {takeBall}
