@@ -6,21 +6,6 @@
 const {Raphael,Paper,Set,Circle,Ellipse,Image,Rect,Text,Path,Line} = require('react-raphael');
 
 
-var numMapping = {
-	'00': 0.4,
-	'3': 0.26,
-	'5': 0.15,
-	'9': 0.9483554378602607,
-	'15': 0.23,
-	'17': 0.12,
-	'22': 0.2,
-	'23': 0.8,
-	'24': 0.3,
-	'29': 0.5,
-	'31': 0.6,
-	'32': 0.1,
-};
-
 function Rgb(r, g, b) {
 	this.r = r;
 	this.g = g;
@@ -637,7 +622,7 @@ function showRoulletteWheel() {
 
 function toggleRoulletteWheel() {
 	roulette.sa = 0;
-	ball.sa = 0.33*360.0;
+	ball.sa = 0.94*360.0;
 	rouletteSpinner.doRollBall();
 	rouletteSpinner.doTogglePause();
 }
@@ -649,6 +634,48 @@ function throwBall() {
 function takeBall() {
 	rouletteSpinner.doTakeBall()
 }
+
+var numberMapping = {
+	0: 30,
+	0.03: 11,
+	0.05:7,
+	0.08:20,
+	0.1:32,
+	0.13:17,
+	0.16:5,
+	0.18:22,
+	0.21:34,
+	0.23:15,
+	0.26:3,
+	0.29:24,
+	0.31:36,
+	0.34:13,
+	0.36:1,
+	0.39:0,
+	0.42:27,
+	0.44:10,
+	0.47:25,
+	0.49:29,
+	0.52:12,
+	0.55:8,
+	0.57:19,
+	0.6:31,
+	0.62:18,
+	0.65:6,
+	0.68:21,
+	0.7:33,
+	0.73:16,
+	0.75:4,
+	0.78:23,
+	0.81:35,
+	0.83:14,
+	0.86:2,
+	0.88:0,
+	0.91:28,
+	0.94:9,
+	0.96:26,
+};
+
 
 
 export {rouletteSpinner}
