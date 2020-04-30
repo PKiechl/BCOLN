@@ -5,6 +5,22 @@
 
 const {Raphael,Paper,Set,Circle,Ellipse,Image,Rect,Text,Path,Line} = require('react-raphael');
 
+
+var numMapping = {
+	'00': 0.4,
+	'3': 0.26,
+	'5': 0.15,
+	'9': 0.9483554378602607,
+	'15': 0.23,
+	'17': 0.12,
+	'22': 0.2,
+	'23': 0.8,
+	'24': 0.3,
+	'29': 0.5,
+	'31': 0.6,
+	'32': 0.1,
+};
+
 function Rgb(r, g, b) {
 	this.r = r;
 	this.g = g;
@@ -393,7 +409,7 @@ var ball = {
 		this.reset();
 	},
 	reset: function() {
-		this.sa = Math.random()*360.0;
+		this.sa = 0.1*360.0;
 		this.r = 2.0;
 		this.stopped = false;
 		this.render = false;
@@ -410,11 +426,15 @@ var ball = {
 		if (r == 0.0) {
 			this.stop();
 		} else if (r > 0.0 && r <= 0.28) {
-			var deltaR = Math.random() * 0.10 - 0.05;
+			var randomNum1 = Math.random();
+			randomNum1 = 0.1;
+			var deltaR = randomNum1 * 0.10 - 0.05;
 			this.r += deltaR;
 			r += deltaR;
-			
-			var deltaA = Math.random() * 20 - 10;
+
+			var randomNum2 = Math.random();
+			randomNum2 = 0.1;
+			var deltaA = randomNum2 * 20 - 10;
 			this.sa += deltaA;
 		}
 	},
@@ -540,6 +560,7 @@ var rouletteSpinner = {
 		setTimeout(function(){
 			ball.reset();
 		}, this.intervalMs);
+		this.doTogglePause();
 	},
 	
 	next: function() {
@@ -615,7 +636,10 @@ function showRoulletteWheel() {
 }
 
 function toggleRoulletteWheel() {
-	rouletteSpinner.doTogglePause()
+	roulette.sa = 0;
+	ball.sa = 0.33*360.0;
+	rouletteSpinner.doRollBall();
+	rouletteSpinner.doTogglePause();
 }
 
 function throwBall() {
