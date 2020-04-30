@@ -669,9 +669,10 @@ function showRoulletteWheel() {
 	}, 1000);
 }
 
-function throwBall() {
+function throwBall(winningNumber) {
+	const number = backNumberMapping[winningNumber];
 	roulette.sa = 0;
-	ball.sa = 0.94*360.0;
+	ball.sa = number*360.0;
 	rouletteSpinner.doRollBall();
 	rouletteSpinner.doTogglePause();
 }

@@ -9,7 +9,7 @@ import Bets from "./Bets";
 import Header from "./Header";
 import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
-import RouletteWheel from "./RouletteWheel";
+import {showRoulletteWheel, throwBall, takeBall} from './roulette'
 
 //RPC server from GANACHE,
 const web3 = new Web3("ws://127.0.0.1:7545");
@@ -65,6 +65,7 @@ class App extends React.Component {
         if (event.event === "RouletteDone") {
           this.setState({ winningNumber: event.returnValues.rng });
           this.getAccountBalance();
+          throwBall(event.returnValues.rng)
         }
       }
     );
@@ -94,6 +95,7 @@ class App extends React.Component {
   };
 
   callSetReady = async event => {
+    showRoulletteWheel()
     event.preventDefault();
     const account = this.state.address;
     const res = await RouletteContract.methods.setReady();
@@ -212,6 +214,7 @@ class App extends React.Component {
   replayRoulette = async () => {
     await this.resetRouletteState();
     this.callJoin(this.state.address);
+    takeBall()
   };
 
   callLeave = async () => {
@@ -310,7 +313,14 @@ class App extends React.Component {
               >
                 back
               </button>
-              <RouletteWheel/>
+
+              <div id="rouletteTable">
+                <div id="rouletteWheel"></div>
+                <div id="ballWheel"></div>
+                <div className="clearfix"></div>
+                <div id="chipTable"></div>
+              </div>
+
             </Route>
           </div>
         </BrowserRouter>
