@@ -36,7 +36,8 @@ class App extends React.Component {
     ready: false,
     amount: "",
     bets: [],
-    ballStopped: false
+    ballStopped: false,
+    wheelLoaded: false,
   };
   constructor(props) {
     super(props);
@@ -99,7 +100,11 @@ class App extends React.Component {
   };
 
   callSetReady = async event => {
-    showRoulletteWheel()
+    if (!this.state.wheelLoaded) {
+      showRoulletteWheel();
+      this.setState({ wheelLoaded: true });
+    }
+
     event.preventDefault();
     const account = this.state.address;
     const res = await RouletteContract.methods.setReady();
