@@ -35,12 +35,16 @@ class App extends React.Component {
     // ready: -> player done placing bets
     ready: false,
     amount: "",
-    bets: []
+    bets: [],
+    ballStopped: false
   };
   constructor(props) {
     super(props);
     this.watchEvents(OracleContract);
     this.watchEvents(RouletteContract);
+    document.addEventListener("winningNumberDetermined", function(e) {
+      this.setState({ ballStopped: true });
+    }.bind(this));
   }
 
   async watchEvents(contract) {
@@ -239,6 +243,7 @@ class App extends React.Component {
     this.setState({ amount: "" });
     this.setState({ bets: [] });
     this.setState({ winningNumber: "" });
+    this.setState({ ballStopped: false});
   }
 
   getAccountBalance = async () => {
@@ -274,7 +279,7 @@ class App extends React.Component {
                 }
               />
               <SubmittedBets bets={this.state.bets} />
-              <div className="ui message">
+              <div className="ui message" hidden={!this.state.ballStopped}>
                 <div className="header">Winning Number</div>
                 <p>{this.state.winningNumber}</p>
               </div>

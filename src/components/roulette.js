@@ -6,6 +6,8 @@
 const {Raphael,Paper,Set,Circle,Ellipse,Image,Rect,Text,Path,Line} = require('react-raphael');
 
 
+const winningNumberDeterminedEvent = new CustomEvent("winningNumberDetermined");
+
 function Rgb(r, g, b) {
 	this.r = r;
 	this.g = g;
@@ -490,6 +492,7 @@ var ball = {
 		this.stopped = true;
 		this.sa = this.roulette.roundAngle(this.sa);
 		var w = this.detWinningNumber();
+		document.dispatchEvent(winningNumberDeterminedEvent);
 		console.log("Winner: w[" + w + "]");
 	},
 	detWinningNumber: function() {
