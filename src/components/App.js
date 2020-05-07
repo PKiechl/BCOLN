@@ -271,6 +271,14 @@ class App extends React.Component {
             </Route>
             <Route exact path="/game">
               <Balance eths={this.state.eths} address={this.state.address} />
+
+              <div id="rouletteTable">
+                <div id="rouletteWheel"></div>
+                <div id="ballWheel"></div>
+                <div className="clearfix"></div>
+                {/*<div id="chipTable"></div>*/}
+              </div>
+
               <InputBar
                 onFormSubmit={this.setAmount}
                 // val = {this.state.amount}
@@ -295,13 +303,6 @@ class App extends React.Component {
               >
                 Set Ready
               </button>
-              {/*<button*/}
-              {/*  className="ui button"*/}
-              {/*  disabled={!this.state.ready}*/}
-              {/*  onClick={this.callContractGet}*/}
-              {/*>*/}
-              {/*  Get random number*/}
-              {/*</button>*/}
               <button
                 className="ui button"
                 disabled={!this.state.bet}
@@ -324,12 +325,7 @@ class App extends React.Component {
                 back
               </button>
 
-              <div id="rouletteTable">
-                <div id="rouletteWheel"></div>
-                <div id="ballWheel"></div>
-                <div className="clearfix"></div>
-                <div id="chipTable"></div>
-              </div>
+
 
             </Route>
           </div>

@@ -131,7 +131,6 @@ contract roulette{
 
 //    ### BETS
     //https://livecasino.com/wp-content/uploads/2018/12/How-to-bet-on-roulette-Red.png
-    // TODO: verify if these are all possible bets
 
     function betRed() payable public {
         uint8[] memory numbers=new uint8[](18);

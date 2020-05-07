@@ -11,7 +11,7 @@ contract Oracle is usingOraclize{
     event LogQueryNotSent(string description);
     event LogQueryDone(bytes32 id, string result);
     bytes32 rng;
-    bool done=false;
+//    bool done=false;
     uint urng;
 
     constructor()public payable{
@@ -22,7 +22,6 @@ contract Oracle is usingOraclize{
     }
 
     function getRandomNumber() public view returns (uint){
-
         return urng;
     }
 
@@ -41,71 +40,28 @@ contract Oracle is usingOraclize{
 
         //to debug, check with ethereum-bridge in terminal
         emit LogQuerySent("sent query");
-        //TODO right now queryId is returned, not the actual result.
-        //TODO need stringToUint conversion and __callback function
 
     }
 
     function __callback(bytes32 myQueryId, string memory result) public {
-//        //https://medium.com/aigang-network/how-ethereum-contract-can-communicate-with-external-data-source-2e32616ea180
+        //https://medium.com/aigang-network/how-ethereum-contract-can-communicate-with-external-data-source-2e32616ea180
         urng = parseInt(result);
-        done=true;
+//        done=true;
         emit LogQueryDone(myQueryId, result);
     }
 
-    function setDoneFalse() public{
-        done=false;
-    }
-
-    function getDone()public view returns (bool){
-        return done;
-    }
+//    function setDoneFalse() public{
+//        done=false;
+//    }
+//
+//    function getDone()public view returns (bool){
+//        return done;
+//    }
 
     ////
     function getRandom()public view returns (bytes32){
         return rng;
     }
 
-    function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
-        //From Oraclize
-        if (_i == 0) {
-            return "0";
-        }
-        uint j = _i;
-        uint len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint k = len - 1;
-        while (_i != 0) {
-            bstr[k--] = byte(uint8(48 + _i % 10));
-            _i /= 10;
-        }
-        return string(bstr);
-    }
-
-
-    function bytesToUInt(bytes32 v) public returns (uint ret) {
-        if (v == 0x0) {
-            //            throw;
-        }
-
-        uint digit;
-
-        for (uint i = 0; i < 32; i++) {
-            digit = uint((uint(v) / (2 ** (8 * (31 - i)))) & 0xff);
-            if (digit == 0) {
-                break;
-            }
-            else if (digit < 48 || digit > 57) {
-                //                throw;
-            }
-            ret *= 10;
-            ret += (digit - 48);
-        }
-        return ret;
-    }
 
 }
