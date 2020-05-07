@@ -7,7 +7,7 @@ class SubmittedBets extends React.Component {
         const bets = this.props.bets;
 
         return (
-            <div className="ui padded segment">
+            <div className="ui  segment">
                 <h3 className="ui header">Submitted Bets</h3>
                 <ul className="ui list">
                     {bets.map((value, index) => {

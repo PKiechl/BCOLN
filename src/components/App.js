@@ -11,7 +11,7 @@ import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
 import { showRouletteWheel, throwBall, takeBall } from "./roulette";
 import "./roulette.css";
-import Modal from "./modal/Modal";
+import ModalTable from "./modal/Modal";
 
 //RPC server from GANACHE,
 const web3 = new Web3("ws://127.0.0.1:7545");
@@ -29,7 +29,7 @@ class App extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
   state = {
-    winningNumber: "",
+    winningNumber: null,
     address: null,
     eths: 0,
     // bet: -> bet has been placed
@@ -55,19 +55,15 @@ class App extends React.Component {
     );
   }
 
-  componentDidMount() {
-    // showRouletteWheel();
-  }
-
   openModalHandler = () => {
     this.setState({
-      isShowing: true
+      isModalShowing: true
     });
   };
 
   closeModalHandler = () => {
     this.setState({
-      isShowing: false
+      isModalShowing: false
     });
   };
 
@@ -81,10 +77,7 @@ class App extends React.Component {
           console.error("error while waiting for events");
           return;
         }
-        console.log(
-          "event arrived.",
-          event.event
-        );
+        console.log("event arrived.", event.event);
         if (event.event === "LogQueryDone") {
           console.log("query returned result: ", event.returnValues.result);
           this.callPlay();
@@ -291,19 +284,21 @@ class App extends React.Component {
             </Route>
             <Route exact path="/game">
               <Balance eths={this.state.eths} address={this.state.address} />
+              <div>
+                <ModalTable />
+              </div>
 
-              <InputBar
-                onFormSubmit={this.setAmount}
-                // val = {this.state.amount}
-                inputText={"enter ether amount to bet"}
-                disabled={this.state.ready || this.state.bet}
-              />
               <div className="ui container" style={{ border: "1px red" }}>
-                {/*<div id="rouletteTable">*/}
                 <div id="rouletteWheel"></div>
                 <div id="ballWheel"></div>
                 <div className="clearfix"></div>
               </div>
+
+              <InputBar
+                onFormSubmit={this.setAmount}
+                inputText={"enter ether amount to bet"}
+                disabled={this.state.ready || this.state.bet}
+              />
 
               <Bets
                 onClick={this.callBet}

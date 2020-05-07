@@ -52,15 +52,6 @@ function Segment(c, number, rgb) {
   this.rgb = rgb;
 }
 
-// var util = {
-//   reverse: function(a1) {
-//     var a2 = new Array(a1.length);
-//     for (var i = 0; i < a1.length; i++) {
-//       a2[a1.length - i - 1] = a1[i];
-//     }
-//     return a2;
-//   }
-// };
 
 var europeanWheel = [
   "r30",
@@ -587,9 +578,6 @@ var rouletteSpinner = {
 
     roulette.init(rouletteWheelPaper, ballWheelPaper);
     ball.init(rouletteWheelPaper, ballWheelPaper, roulette);
-    // roulette.init(rouletteWheelPaper);
-    // ball.init(rouletteWheelPaper, roulette);
-
     this.next();
   },
 
@@ -602,7 +590,6 @@ var rouletteSpinner = {
     setTimeout(function() {
       ball.reset();
     }, this.intervalMs);
-    // this.doTogglePause();
     this.doSetPause(true);
   },
 
@@ -632,7 +619,6 @@ var rouletteSpinner = {
 
   render: function() {
     roulette.renderRouletteWheel();
-    // roulette.renderBallWheel();
   },
 
   spinWheel: function() {
@@ -733,7 +719,6 @@ function throwBall(winningNumber) {
   roulette.sa = 0;
   ball.sa = number * 360.0;
   rouletteSpinner.doRollBall();
-  // rouletteSpinner.doTogglePause();
   rouletteSpinner.doSetPause(false);
 }
 

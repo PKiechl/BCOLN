@@ -1,30 +1,43 @@
-import React from "react";
+import React, { Component } from "react";
+import { Button, Icon, Modal, Image } from "semantic-ui-react";
 
-import "./Modal.css";
+class ModalTable extends Component {
+  state = { open: false };
 
-const modal = props => {
-  return (
-    <div>
-      <div
-        className="modal-wrapper"
-        style={{
-          transform: props.show ? "translateY(0vh)" : "translateY(-100vh)",
-          opacity: props.show ? "1" : "0"
-        }}
+  open = () => this.setState({ open: true });
+  close = () => this.setState({ open: false });
+
+  render() {
+    const { open } = this.state;
+
+    return (
+      <Modal
+        open={open}
+        onOpen={this.open}
+        onClose={this.close}
+        size="tiny"
+        trigger={
+          <Button primary icon>
+            Show Roulette Table <Icon name="right chevron" />
+          </Button>
+        }
       >
-        <div className="modal-header">
-          <h3>Quick Help</h3>
-          <span className="close-modal-btn" onClick={props.close}>
-            ×
-          </span>
-        </div>
-        <div className="modal-body">
-          <p>{props.children}</p>
-        </div>
-        <div className="modal-footer"></div>
-      </div>
-    </div>
-  );
-};
+        <Modal.Header>Roulette Table</Modal.Header>
+        <Modal.Content>
+          <div>
+            <Image
+              centered
+              size="large"
+              src="https://www.junkets.ca/gaming/roulette.jpg"
+            />
+          </div>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button icon="check" content="Close" onClick={this.close} />
+        </Modal.Actions>
+      </Modal>
+    );
+  }
+}
 
-export default modal;
+export default ModalTable;

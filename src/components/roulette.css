@@ -8,14 +8,14 @@
 /*    padding: 10px;*/
 /*    margin: 0;*/
 /*}*/
-h1 {
-    color: #000000;
-    margin: 0;
-}
-p {
-    margin: 0;
-    padding: 0;
-}
+/*h1 {*/
+/*    color: #000000;*/
+/*    margin: 0;*/
+/*}*/
+/*p {*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*}*/
 /*#header {*/
 /*    background-image: url(ledlogic03.gif);*/
 /*    background-repeat: no-repeat;*/
@@ -35,16 +35,16 @@ p {
 /*    text-align: center;*/
 /*    vertical-align: top;*/
 /*}*/
-#rouletteTable {
-    border: 1px solid #e0e0e0;
-    float: left;
-    height: 530px;
-    left: 50%;
-    margin-left: -400px;
-    padding: 10px;
-    position: relative;
-    width: 424px;
-}
+/*#rouletteTable {*/
+/*    border: 1px solid #e0e0e0;*/
+/*    float: left;*/
+/*    height: 530px;*/
+/*    left: 50%;*/
+/*    margin-left: -400px;*/
+/*    padding: 10px;*/
+/*    position: relative;*/
+/*    width: 424px;*/
+/*}*/
 #rouletteWheel {
     border: 1px solid #e0e0e0;
     float: left;
