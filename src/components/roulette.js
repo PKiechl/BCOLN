@@ -3,741 +3,728 @@
  * Copyright (c) 2010-2015 Jeff D. Conrad
  */
 
-const {Raphael,Paper,Set,Circle,Ellipse,Image,Rect,Text,Path,Line} = require('react-raphael');
-
+const {
+  Raphael,
+  Paper,
+  Set,
+  Circle,
+  Ellipse,
+  Image,
+  Rect,
+  Text,
+  Path,
+  Line
+} = require("react-raphael");
 
 const winningNumberDeterminedEvent = new CustomEvent("winningNumberDetermined");
 
 function Rgb(r, g, b) {
-	this.r = r;
-	this.g = g;
-	this.b = b;
+  this.r = r;
+  this.g = g;
+  this.b = b;
 }
 
 var palette = {
-	white: new Rgb(255, 255, 255),
-	red: new Rgb(200, 0, 0),
-	green: new Rgb(0, 150, 0),
-	blue: new Rgb(0, 0, 255),
-	black: new Rgb(0, 0, 0),
-	
-	getRgbForC: function(c) {
-		switch (c) {
-			case 'r':
-				return this.red;
-				break;
-			case 'g':
-				return this.green;
-				break;
-			case 'b':
-				return this.black;
-				break;
-		}
-	}
+  white: new Rgb(255, 255, 255),
+  red: new Rgb(200, 0, 0),
+  green: new Rgb(0, 150, 0),
+  blue: new Rgb(0, 0, 255),
+  black: new Rgb(0, 0, 0),
+
+  getRgbForC: function(c) {
+    switch (c) {
+      case "r":
+        return this.red;
+        break;
+      case "g":
+        return this.green;
+        break;
+      case "b":
+        return this.black;
+        break;
+    }
+  }
 };
 
 function Segment(c, number, rgb) {
-	this.c = c;
-	this.number = number;
-	this.rgb = rgb;
+  this.c = c;
+  this.number = number;
+  this.rgb = rgb;
 }
 
 var util = {
-	reverse: function(a1) {
-		var a2 = new Array(a1.length);
-		for (var i=0; i < a1.length; i++) {
-			a2[ a1.length - i - 1 ] = a1[i];
-		}
-		return a2;
-	}
-}
+  reverse: function(a1) {
+    var a2 = new Array(a1.length);
+    for (var i = 0; i < a1.length; i++) {
+      a2[a1.length - i - 1] = a1[i];
+    }
+    return a2;
+  }
+};
 
-// 37 segments
-// var europeanWheel = util.reverse([
-// 	'r1', 'b13', 'r36', 'b24',
-// 	'r3', 'b15', 'r34', 'b22', 'r5',
-// 	'b17', 'r32', 'b20', 'r7', 'b11',
-// 	'r30', 'b26', 'r9', 'b28', 'g0','r27',
-// 	'b2', 'r14', 'b35', 'r23', 'b4',
-// 	'r16', 'b33', 'r21', 'b6', 'r18',
-// 	'b31', 'r19', 'b8', 'r12', 'b29',
-// 	'r25', 'b10'
-// ]);
-var europeanWheel = ([
-	'r30','b8', 'r23', 'b10','r5',
-	'b24', 'r16', 'b33', 'r1', 'b20',
-	'r14', 'b31', 'r9', 'b22', 'r18',
-	'b29', 'r7', 'b28', 'r12', 'b35',
-	'r3', 'b26',
-	'g0', 'r32', 'b15', 'r19',
-	'b4', 'r21', 'b2', 'r25', 'b17',
-	'r34', 'b6', 'r27', 'b13', 'r36',
-	'b11'
-
-]);
+var europeanWheel = [
+  "r30",
+  "b8",
+  "r23",
+  "b10",
+  "r5",
+  "b24",
+  "r16",
+  "b33",
+  "r1",
+  "b20",
+  "r14",
+  "b31",
+  "r9",
+  "b22",
+  "r18",
+  "b29",
+  "r7",
+  "b28",
+  "r12",
+  "b35",
+  "r3",
+  "b26",
+  "g0",
+  "r32",
+  "b15",
+  "r19",
+  "b4",
+  "r21",
+  "b2",
+  "r25",
+  "b17",
+  "r34",
+  "b6",
+  "r27",
+  "b13",
+  "r36",
+  "b11"
+];
 var roulette = {
-	aps: 360.0/37.0,
-	sa: 0, // start angle
-	seg: null,
-	wheel: null,
-	rouletteWheelPaper: null,
-	ballWheelPaper: null,
+  aps: 360.0 / 37.0,
+  sa: 0, // start angle
+  seg: null,
+  wheel: null,
+  rouletteWheelPaper: null,
+  ballWheelPaper: null,
 
-	init: function(rouletteWheelPaper, ballWheelPaper) {
-		this.rouletteWheelPaper = rouletteWheelPaper;
-		this.ballWheelPaper = ballWheelPaper;
-		this.sa = this.aps / 2.0;
-	
-		// pick wheel type
-		this.wheel = europeanWheel;
-	
-		// create segments
-		this.seg = new Array(this.wheel.length);
-		for (var i=0; i<this.wheel.length; i++) {
-			var w = this.wheel[i];
-			var c = w.substring(0, 1);
-			var n = w.substring(1);
-			var rgb = palette.getRgbForC(c);
-			this.seg[i] = new Segment(c, n, rgb);
-		}
-		
-		this.renderRouletteWheel();
-	},	
-	renderRouletteWheel: function() {
-		// roulette wheel
-		var paper = this.rouletteWheelPaper;
-		paper.clear();
-		
-		// outer path
-		var d0 = 300;
-		var m0 = d0 * 0.01;
-		var x0 = d0 / 2;
-		var y0 = d0 / 2;
-		var r0 = d0 / 2 - 2 * m0;
-		var outerWheel0 = paper.circle(x0, y0, r0);
-		outerWheel0.attr("fill", "#c0c0c0");
-		outerWheel0.attr("stroke", "#666666");
-		outerWheel0.attr("stroke-width", "1");
+  init: function(rouletteWheelPaper, ballWheelPaper) {
+    this.rouletteWheelPaper = rouletteWheelPaper;
+    this.ballWheelPaper = ballWheelPaper;
+    this.sa = this.aps / 2.0;
 
-		var d = d0;
-		var m = d0 * 0.075;
-		var x = d / 2;
-		var y = d / 2;
-		var r = d / 2 - m;
-		
-		// render segments
-		for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
-			var seg = this.seg[segIndex];
-		
-		 	var a1 = segIndex * roulette.aps + roulette.sa;
-		 	var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
-			
-			var flag = (a2 - a1) > 180;
-            var clr = (a2 - a1) / 360;
-            
-            // to radians
-            a1 = a1 * Math.PI / 180;
-            a2 = a2 * Math.PI / 180;
-            
-            var rgb = seg.rgb;
-			
-            var attr = {
-				path: [["M", x, y],
-				       ["l", r * Math.cos(a1), r * Math.sin(a1)],
-				       ["A", r, r, 0, +flag, 1, x + r * Math.cos(a2), y + r * Math.sin(a2)],
-				       ["z"]],
-				fill: "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")",
-				stroke: "#fff"
-			};
-			paper.path().attr(attr);
-		}
+    // pick wheel type
+    this.wheel = europeanWheel;
 
-		// render wheel numbers
-		for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
-			var seg = this.seg[segIndex];
-		
-		 	var a1 = segIndex * roulette.aps + roulette.sa;
-		 	var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
-			
-			var flag = (a2 - a1) > 180;
-            var clr = (a2 - a1) / 360;
-            
-            // to radians
-            a1 = a1 * Math.PI / 180;
-            a2 = a2 * Math.PI / 180;
-            
-            // text goes at midpoint
-        	var number = seg.number;
-			var a3 = (a1 + a2) / 2;
-			
-			var tr = r - 10;
-			var tx = x + tr * Math.cos(a3);
-			var ty = y + tr * Math.sin(a3);
-			var trot = a3 * 180 / Math.PI - 90;
-			
-			paper.text(tx, ty, number).attr({
-				font: '100 7.5px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif',
-				fill: "#fff",
-				rotation: trot
-				});
-		}
-		
-		var d2 = d0;
-		var m2 = d0 * 0.1375;
-		var r2 = d2 / 2 - m2;
-		var innerWheel2 = paper.circle(x, y, r2);
-		innerWheel2.attr("stroke", "#ffffff");
-		innerWheel2.attr("stroke-width", "1");
-		
-		var d4 = d0;
-		var m4 = d0 * 0.2;
-		var r4 = d4 / 2 - m4;
-		var pocketWheel4 = paper.circle(x, y, r4);
-		pocketWheel4.attr("fill", "#000000");
-		pocketWheel4.attr("stroke", "#ffffff");
-		pocketWheel4.attr("stroke-width", "1");
-		
-		var wra = 45;
-		var wr = d0 * 0.1;
-		for (var i=0; i < 4; i++) {
-			var aw = i / 4 * 360 + wra + roulette.sa;
-			aw = aw * Math.PI / 180;
-            var attr = {
-				path: [["M", x, y],
-					   ["l", wr * Math.cos(aw), wr * Math.sin(aw)]
-				],
-				stroke: "#ffffff",
-				"stroke-width": "2"
-			};
-			paper.path().attr(attr);
-		}
+    // create segments
+    this.seg = new Array(this.wheel.length);
+    for (var i = 0; i < this.wheel.length; i++) {
+      var w = this.wheel[i];
+      var c = w.substring(0, 1);
+      var n = w.substring(1);
+      var rgb = palette.getRgbForC(c);
+      this.seg[i] = new Segment(c, n, rgb);
+    }
 
-		var d5 = d0;
-		var m5 = d0 * 0.45;
-		var r5 = d5 / 2 - m5;
-		var pocketWheel5 = paper.circle(x, y, r5);
-		pocketWheel5.attr("stroke", "#ffffff");
-		pocketWheel5.attr("stroke-width", "1");
-		
-		var d7 = d0;
-		var m7 = d0 * 0.475;
-		var r7 = d7 / 2 - m7;
-		var handleWheel2 = paper.circle(x, y, r7);
-		handleWheel2.attr("fill", "#000000");
-		handleWheel2.attr("stroke", "#ffffff");
-		handleWheel2.attr("stroke-width", "2");
-		
-		ball.renderRouletteWheelBall();
-	},
-	/**
-	 * Determines the center of the segment containing the provided angle.
-	 */
-	roundAngle: function (at) {
-		for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
-			var a1 = segIndex * roulette.aps + roulette.sa;
-			var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
-			a1 = this.limitAngle(a1);
-			a2 = this.limitAngle(a2);
-			at = this.limitAngle(at);
-			if (a1 - 180.0 > 0 && a2 - 180.0 < 0) {
-				a1 += 360.0;
-				a2 += 360.0;
-				at += 360.0;
-			}
-			if (at >= a1 && at <= a2) {
-				return (a1 + a2) / 2.0;
-			}
-		}
-		return at;
-	},
-	limitAngle: function (a) {
-		var ret = a;
-		while (ret > 360.0) {
-			ret -= 360.0;
-		}
-		return ret;
-	},
-	renderBallWheel: function() {
-		// roulette wheel
-		var paper = this.ballWheelPaper;
-		paper.clear();
-		
-		if (!ball.render) {
-			return;
-		}
-		
-		var minAngle = this.roundAngle(ball.sa);
-		
-		// outer path
-		var d0 = 900;
-		var m0 = d0 * 0.01;
-		var x0 = 50;
-		var y0 = -150;
-		var r0 = d0 / 2 - 2 * m0;
-		var outerWheel0 = paper.circle(x0, y0, r0);
-		outerWheel0.attr("fill", "#c0c0c0");
-		outerWheel0.attr("stroke", "#666666");
-		outerWheel0.attr("stroke-width", "1");
+    this.renderRouletteWheel();
+  },
+  renderRouletteWheel: function() {
+    // roulette wheel
+    var paper = this.rouletteWheelPaper;
+    paper.clear();
 
-		var d = d0;
-		var m = d0 * 0.075;
-		var x = x0;
-		var y = y0;
-		var r = d / 2 - m;
-				
-		// render segments
-		for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
-			var seg = this.seg[segIndex];
-		
-		 	var a1 = segIndex * roulette.aps + roulette.sa - minAngle + 90;
-		 	var a2 = (segIndex + 1) * roulette.aps + roulette.sa - minAngle + 90;
-			
-			var flag = (a2 - a1) > 180;
-            var clr = (a2 - a1) / 360;
-            
-            a1 = a1 * Math.PI / 180;
-            a2 = a2 * Math.PI / 180;
-            
-            var rgb = seg.rgb;
-			
-            var attr = {
-				path: [["M", x, y],
-				       ["l", r * Math.cos(a1), r * Math.sin(a1)],
-				       ["A", r, r, 0, +flag, 1, x + r * Math.cos(a2), y + r * Math.sin(a2)],
-				       ["z"]],
-				fill: "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")",
-				stroke: "#fff"
-			};
-			paper.path().attr(attr);
-		}
+    // outer path
+    var d0 = 300;
+    var m0 = d0 * 0.01;
+    var x0 = d0 / 2;
+    var y0 = d0 / 2;
+    var r0 = d0 / 2 - 2 * m0;
+    var outerWheel0 = paper.circle(x0, y0, r0);
+    outerWheel0.attr("fill", "#c0c0c0");
+    outerWheel0.attr("stroke", "#666666");
+    outerWheel0.attr("stroke-width", "1");
 
-		// render wheel numbers
-		for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
-			var seg = this.seg[segIndex];
-		
-		 	var a1 = segIndex * roulette.aps + roulette.sa - minAngle + 90;
-		 	var a2 = (segIndex + 1) * roulette.aps + roulette.sa - minAngle + 90;
-			
-			var flag = (a2 - a1) > 180;
-            var clr = (a2 - a1) / 360;
-            
-            a1 = a1 * Math.PI / 180;
-            a2 = a2 * Math.PI / 180;
-            
-            // text goes at midpoint
-        	var number = seg.number;
-			var a3 = (a1 + a2) / 2;
-			
-			var tr = r - 30;
-			var tx = x + tr * Math.cos(a3);
-			var ty = y + tr * Math.sin(a3);
-			var trot = a3 * 180 / Math.PI - 90;
-			
-			paper.text(tx, ty, number).attr({
-				font: '100 22.5px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif',
-				fill: "#fff",
-				rotation: trot
-				});
-		}
-		
-		var d2 = d0;
-		var m2 = d0 * 0.1375;
-		var r2 = d2 / 2 - m2;
-		var innerWheel2 = paper.circle(x, y, r2);
-		innerWheel2.attr("stroke", "#ffffff");
-		innerWheel2.attr("stroke-width", "1");
-		
-		var d4 = d0;
-		var m4 = d0 * 0.2;
-		var r4 = d4 / 2 - m4;
-		var pocketWheel4 = paper.circle(x, y, r4);
-		pocketWheel4.attr("fill", "#000000");
-		pocketWheel4.attr("stroke", "#ffffff");
-		pocketWheel4.attr("stroke-width", "1");
-		
-		var wra = 45;
-		var wr = d0 * 0.1;
-		for (var i=0; i < 4; i++) {
-			var aw = i / 4 * 360 + wra + roulette.sa - minAngle + 90;
-			aw = aw * Math.PI / 180;
-            var attr = {
-				path: [["M", x, y],
-					   ["l", wr * Math.cos(aw), wr * Math.sin(aw)]
-				],
-				stroke: "#ffffff",
-				"stroke-width": "2"
-			};
-			paper.path().attr(attr);
-		}
+    var d = d0;
+    var m = d0 * 0.075;
+    var x = d / 2;
+    var y = d / 2;
+    var r = d / 2 - m;
 
-		var d5 = d0;
-		var m5 = d0 * 0.45;
-		var r5 = d5 / 2 - m5;
-		var pocketWheel5 = paper.circle(x, y, r5);
-		pocketWheel5.attr("stroke", "#ffffff");
-		pocketWheel5.attr("stroke-width", "1");
-		
-		var d7 = d0;
-		var m7 = d0 * 0.475;
-		var r7 = d7 / 2 - m7;
-		var handleWheel2 = paper.circle(x, y, r7);
-		handleWheel2.attr("fill", "#000000");
-		handleWheel2.attr("stroke", "#ffffff");
-		handleWheel2.attr("stroke-width", "2");
-		
-		if (ball.stopped) {
-			ball.renderBallWheelBall(minAngle);
-		}
-	}
+    // render segments
+    for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
+      var seg = this.seg[segIndex];
+
+      var a1 = segIndex * roulette.aps + roulette.sa;
+      var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
+
+      var flag = a2 - a1 > 180;
+      var clr = (a2 - a1) / 360;
+
+      // to radians
+      a1 = (a1 * Math.PI) / 180;
+      a2 = (a2 * Math.PI) / 180;
+
+      var rgb = seg.rgb;
+
+      var attr = {
+        path: [
+          ["M", x, y],
+          ["l", r * Math.cos(a1), r * Math.sin(a1)],
+          ["A", r, r, 0, +flag, 1, x + r * Math.cos(a2), y + r * Math.sin(a2)],
+          ["z"]
+        ],
+        fill: "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")",
+        stroke: "#fff"
+      };
+      paper.path().attr(attr);
+    }
+
+    // render wheel numbers
+    for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
+      var seg = this.seg[segIndex];
+
+      var a1 = segIndex * roulette.aps + roulette.sa;
+      var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
+
+      var flag = a2 - a1 > 180;
+      var clr = (a2 - a1) / 360;
+
+      // to radians
+      a1 = (a1 * Math.PI) / 180;
+      a2 = (a2 * Math.PI) / 180;
+
+      // text goes at midpoint
+      var number = seg.number;
+      var a3 = (a1 + a2) / 2;
+
+      var tr = r - 10;
+      var tx = x + tr * Math.cos(a3);
+      var ty = y + tr * Math.sin(a3);
+      var trot = (a3 * 180) / Math.PI - 90;
+
+      paper.text(tx, ty, number).attr({
+        font:
+          '100 7.5px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif',
+        fill: "#fff",
+        rotation: trot
+      });
+    }
+
+    var d2 = d0;
+    var m2 = d0 * 0.1375;
+    var r2 = d2 / 2 - m2;
+    var innerWheel2 = paper.circle(x, y, r2);
+    innerWheel2.attr("stroke", "#ffffff");
+    innerWheel2.attr("stroke-width", "1");
+
+    var d4 = d0;
+    var m4 = d0 * 0.2;
+    var r4 = d4 / 2 - m4;
+    var pocketWheel4 = paper.circle(x, y, r4);
+    pocketWheel4.attr("fill", "#000000");
+    pocketWheel4.attr("stroke", "#ffffff");
+    pocketWheel4.attr("stroke-width", "1");
+
+    var wra = 45;
+    var wr = d0 * 0.1;
+    for (var i = 0; i < 4; i++) {
+      var aw = (i / 4) * 360 + wra + roulette.sa;
+      aw = (aw * Math.PI) / 180;
+      var attr = {
+        path: [
+          ["M", x, y],
+          ["l", wr * Math.cos(aw), wr * Math.sin(aw)]
+        ],
+        stroke: "#ffffff",
+        "stroke-width": "2"
+      };
+      paper.path().attr(attr);
+    }
+
+    var d5 = d0;
+    var m5 = d0 * 0.45;
+    var r5 = d5 / 2 - m5;
+    var pocketWheel5 = paper.circle(x, y, r5);
+    pocketWheel5.attr("stroke", "#ffffff");
+    pocketWheel5.attr("stroke-width", "1");
+
+    var d7 = d0;
+    var m7 = d0 * 0.475;
+    var r7 = d7 / 2 - m7;
+    var handleWheel2 = paper.circle(x, y, r7);
+    handleWheel2.attr("fill", "#000000");
+    handleWheel2.attr("stroke", "#ffffff");
+    handleWheel2.attr("stroke-width", "2");
+
+    ball.renderRouletteWheelBall();
+  },
+  /**
+   * Determines the center of the segment containing the provided angle.
+   */
+  roundAngle: function(at) {
+    for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
+      var a1 = segIndex * roulette.aps + roulette.sa;
+      var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
+      a1 = this.limitAngle(a1);
+      a2 = this.limitAngle(a2);
+      at = this.limitAngle(at);
+      if (a1 - 180.0 > 0 && a2 - 180.0 < 0) {
+        a1 += 360.0;
+        a2 += 360.0;
+        at += 360.0;
+      }
+      if (at >= a1 && at <= a2) {
+        return (a1 + a2) / 2.0;
+      }
+    }
+    return at;
+  },
+  limitAngle: function(a) {
+    var ret = a;
+    while (ret > 360.0) {
+      ret -= 360.0;
+    }
+    return ret;
+  },
+  renderBallWheel: function() {
+    // roulette wheel
+    var paper = this.ballWheelPaper;
+    paper.clear();
+
+    if (!ball.render) {
+      return;
+    }
+
+    var minAngle = this.roundAngle(ball.sa);
+
+    // outer path
+    var d0 = 900;
+    var m0 = d0 * 0.01;
+    var x0 = 50;
+    var y0 = -150;
+    var r0 = d0 / 2 - 2 * m0;
+    var outerWheel0 = paper.circle(x0, y0, r0);
+    outerWheel0.attr("fill", "#c0c0c0");
+    outerWheel0.attr("stroke", "#666666");
+    outerWheel0.attr("stroke-width", "1");
+
+    var d = d0;
+    var m = d0 * 0.075;
+    var x = x0;
+    var y = y0;
+    var r = d / 2 - m;
+
+    // render segments
+    for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
+      var seg = this.seg[segIndex];
+
+      var a1 = segIndex * roulette.aps + roulette.sa - minAngle + 90;
+      var a2 = (segIndex + 1) * roulette.aps + roulette.sa - minAngle + 90;
+
+      var flag = a2 - a1 > 180;
+      var clr = (a2 - a1) / 360;
+
+      a1 = (a1 * Math.PI) / 180;
+      a2 = (a2 * Math.PI) / 180;
+
+      var rgb = seg.rgb;
+
+      var attr = {
+        path: [
+          ["M", x, y],
+          ["l", r * Math.cos(a1), r * Math.sin(a1)],
+          ["A", r, r, 0, +flag, 1, x + r * Math.cos(a2), y + r * Math.sin(a2)],
+          ["z"]
+        ],
+        fill: "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")",
+        stroke: "#fff"
+      };
+      paper.path().attr(attr);
+    }
+
+    // render wheel numbers
+    for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
+      var seg = this.seg[segIndex];
+
+      var a1 = segIndex * roulette.aps + roulette.sa - minAngle + 90;
+      var a2 = (segIndex + 1) * roulette.aps + roulette.sa - minAngle + 90;
+
+      var flag = a2 - a1 > 180;
+      var clr = (a2 - a1) / 360;
+
+      a1 = (a1 * Math.PI) / 180;
+      a2 = (a2 * Math.PI) / 180;
+
+      // text goes at midpoint
+      var number = seg.number;
+      var a3 = (a1 + a2) / 2;
+
+      var tr = r - 30;
+      var tx = x + tr * Math.cos(a3);
+      var ty = y + tr * Math.sin(a3);
+      var trot = (a3 * 180) / Math.PI - 90;
+
+      paper.text(tx, ty, number).attr({
+        font:
+          '100 22.5px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif',
+        fill: "#fff",
+        rotation: trot
+      });
+    }
+
+    var d2 = d0;
+    var m2 = d0 * 0.1375;
+    var r2 = d2 / 2 - m2;
+    var innerWheel2 = paper.circle(x, y, r2);
+    innerWheel2.attr("stroke", "#ffffff");
+    innerWheel2.attr("stroke-width", "1");
+
+    var d4 = d0;
+    var m4 = d0 * 0.2;
+    var r4 = d4 / 2 - m4;
+    var pocketWheel4 = paper.circle(x, y, r4);
+    pocketWheel4.attr("fill", "#000000");
+    pocketWheel4.attr("stroke", "#ffffff");
+    pocketWheel4.attr("stroke-width", "1");
+
+    var wra = 45;
+    var wr = d0 * 0.1;
+    for (var i = 0; i < 4; i++) {
+      var aw = (i / 4) * 360 + wra + roulette.sa - minAngle + 90;
+      aw = (aw * Math.PI) / 180;
+      var attr = {
+        path: [
+          ["M", x, y],
+          ["l", wr * Math.cos(aw), wr * Math.sin(aw)]
+        ],
+        stroke: "#ffffff",
+        "stroke-width": "2"
+      };
+      paper.path().attr(attr);
+    }
+
+    var d5 = d0;
+    var m5 = d0 * 0.45;
+    var r5 = d5 / 2 - m5;
+    var pocketWheel5 = paper.circle(x, y, r5);
+    pocketWheel5.attr("stroke", "#ffffff");
+    pocketWheel5.attr("stroke-width", "1");
+
+    var d7 = d0;
+    var m7 = d0 * 0.475;
+    var r7 = d7 / 2 - m7;
+    var handleWheel2 = paper.circle(x, y, r7);
+    handleWheel2.attr("fill", "#000000");
+    handleWheel2.attr("stroke", "#ffffff");
+    handleWheel2.attr("stroke-width", "2");
+
+    if (ball.stopped) {
+      ball.renderBallWheelBall(minAngle);
+    }
+  }
 };
 
 var ball = {
-	rouletteWheelPaper: null,
-	ballWheelPaper: null,
-	sa: 0,
-	r: 0,
-	stopped: true,
-	roulette: null,
-	render: false,
-	
-	init: function(rouletteWheelPaper, ballWheelPaper, roulette) {
-		this.rouletteWheelPaper = rouletteWheelPaper;
-		this.ballWheelPaper = ballWheelPaper;
-		this.roulette = roulette;
-		this.reset();
-	},
-	reset: function() {
-		this.sa = 0.1*360.0;
-		this.r = 2.0;
-		this.stopped = false;
-		this.render = false;
-	},
-	getR: function(jumping) {
-		var r = Math.max(Math.min(this.r, 1.0), 0.0);		
-		return r;
-	},
-	/**
-	 * Random jumping of ball as it hits the barriers close to the middle.
-	 */
-	jumpBall: function() {
-		var r = this.getR();
-		if (r == 0.0) {
-			this.stop();
-		} else if (r > 0.0 && r <= 0.28) {
-			var randomNum1 = Math.random();
-			randomNum1 = 0.1;
-			var deltaR = randomNum1 * 0.10 - 0.05;
-			this.r += deltaR;
-			r += deltaR;
+  rouletteWheelPaper: null,
+  ballWheelPaper: null,
+  sa: 0,
+  r: 0,
+  stopped: true,
+  roulette: null,
+  render: false,
 
-			var randomNum2 = Math.random();
-			randomNum2 = 0.1;
-			var deltaA = randomNum2 * 20 - 10;
-			this.sa += deltaA;
-		}
-	},
-	renderRouletteWheelBall: function() {
-		if (!this.render) {
-			return;
-		}
-		
-		// roulette wheel
-		var paper = this.rouletteWheelPaper;
-		
-		var d = 300;
-		var x = d / 2;
-		var y = d / 2;
-		
-		// margin
-		var r1 = 0.080;
-		var r2 = 0.36;
-		
-		var r = this.getR();
-		var m = d * (r * (r1 - r2) + r2);
-		var tr = x - m / 2.0;
-		
-		// radius of ball
-		var trm = d * 0.015;
-		
-		var a = (this.sa) * Math.PI / 180;
-		
-		var tx = x + tr * Math.cos(a);
-		var ty = y + tr * Math.sin(a);
-		
-		var ball0 = paper.circle(tx, ty, trm);
-		ball0.attr("fill", "#ffffff");
-		ball0.attr("stroke", "#666666");
-		ball0.attr("stroke-width", "1");
-	},
-	renderBallWheelBall: function(minAngle) {
-		if (!this.render) {
-			return;
-		}
-		
-		// roulette wheel
-		var paper = this.ballWheelPaper;
-		
-		var d = 900;
-		var x = d / 2.0;
-		var y = -150;
-		
-		// margin
-		var r1 = 0.080;
-		var r2 = 0.36;
-		
-		var r = this.getR();
-		var m = d * (r * (r1 - r2) + r2);
-		var tr = x - m / 2.0;
-		
-		// radius of ball
-		var trm = d * 0.015;
-		var tx = 50;
-		var ty = y + tr;
-		
-		var ball0 = paper.circle(tx, ty, trm);
-		ball0.attr("fill", "#ffffff");
-		ball0.attr("stroke", "#666666");
-		ball0.attr("stroke-width", "1");
-	},
-	stop: function() {
-		this.stopped = true;
-		this.sa = this.roulette.roundAngle(this.sa);
-		var w = this.detWinningNumber();
-		document.dispatchEvent(winningNumberDeterminedEvent);
-		console.log("Winner: w[" + w + "]");
-	},
-	detWinningNumber: function() {
-		// search segments for ballangle
-		for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
-			var seg = roulette.seg[segIndex];
-		
-		 	var a1 = segIndex * roulette.aps + roulette.sa;
-		 	var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
-			
-			seg.a1 = roulette.limitAngle(a1);
-            seg.a2 = roulette.limitAngle(a2);
+  init: function(rouletteWheelPaper, ballWheelPaper, roulette) {
+    this.rouletteWheelPaper = rouletteWheelPaper;
+    this.ballWheelPaper = ballWheelPaper;
+    this.roulette = roulette;
+    this.reset();
+  },
+  reset: function() {
+    this.sa = 0.1 * 360.0;
+    this.r = 2.0;
+    this.stopped = false;
+    this.render = false;
+  },
+  getR: function(jumping) {
+    var r = Math.max(Math.min(this.r, 1.0), 0.0);
+    return r;
+  },
+  /**
+   * Random jumping of ball as it hits the barriers close to the middle.
+   */
+  jumpBall: function() {
+    var r = this.getR();
+    if (r == 0.0) {
+      this.stop();
+    } else if (r > 0.0 && r <= 0.28) {
+      var randomNum1 = Math.random();
+      randomNum1 = 0.1;
+      var deltaR = randomNum1 * 0.1 - 0.05;
+      this.r += deltaR;
+      r += deltaR;
 
-			//console.log("seg.number[" + seg.number + "], seg.a1[" + seg.a1 + "], seg.a2["
-			//           + seg.a2 + "], ball.sa[" + ball.sa + "]");
-			if (seg.a1 <= ball.sa && seg.a2 >= ball.sa) {
-				return seg.number;
-			}
-		}
-		return -1;
-	}
-}
+      var randomNum2 = Math.random();
+      randomNum2 = 0.1;
+      var deltaA = randomNum2 * 20 - 10;
+      this.sa += deltaA;
+    }
+  },
+  renderRouletteWheelBall: function() {
+    if (!this.render) {
+      return;
+    }
+
+    // roulette wheel
+    var paper = this.rouletteWheelPaper;
+
+    var d = 300;
+    var x = d / 2;
+    var y = d / 2;
+
+    // margin
+    var r1 = 0.08;
+    var r2 = 0.36;
+
+    var r = this.getR();
+    var m = d * (r * (r1 - r2) + r2);
+    var tr = x - m / 2.0;
+
+    // radius of ball
+    var trm = d * 0.015;
+
+    var a = (this.sa * Math.PI) / 180;
+
+    var tx = x + tr * Math.cos(a);
+    var ty = y + tr * Math.sin(a);
+
+    var ball0 = paper.circle(tx, ty, trm);
+    ball0.attr("fill", "#ffffff");
+    ball0.attr("stroke", "#666666");
+    ball0.attr("stroke-width", "1");
+  },
+  renderBallWheelBall: function(minAngle) {
+    if (!this.render) {
+      return;
+    }
+
+    // roulette wheel
+    var paper = this.ballWheelPaper;
+
+    var d = 900;
+    var x = d / 2.0;
+    var y = -150;
+
+    // margin
+    var r1 = 0.08;
+    var r2 = 0.36;
+
+    var r = this.getR();
+    var m = d * (r * (r1 - r2) + r2);
+    var tr = x - m / 2.0;
+
+    // radius of ball
+    var trm = d * 0.015;
+    var tx = 50;
+    var ty = y + tr;
+
+    var ball0 = paper.circle(tx, ty, trm);
+    ball0.attr("fill", "#ffffff");
+    ball0.attr("stroke", "#666666");
+    ball0.attr("stroke-width", "1");
+  },
+  stop: function() {
+    this.stopped = true;
+    this.sa = this.roulette.roundAngle(this.sa);
+    var w = this.detWinningNumber();
+    document.dispatchEvent(winningNumberDeterminedEvent);
+    console.log("Winner: w[" + w + "]");
+  },
+  detWinningNumber: function() {
+    // search segments for ballangle
+    for (var segIndex = 0; segIndex < roulette.seg.length; segIndex++) {
+      var seg = roulette.seg[segIndex];
+
+      var a1 = segIndex * roulette.aps + roulette.sa;
+      var a2 = (segIndex + 1) * roulette.aps + roulette.sa;
+
+      seg.a1 = roulette.limitAngle(a1);
+      seg.a2 = roulette.limitAngle(a2);
+
+      //console.log("seg.number[" + seg.number + "], seg.a1[" + seg.a1 + "], seg.a2["
+      //           + seg.a2 + "], ball.sa[" + ball.sa + "]");
+      if (seg.a1 <= ball.sa && seg.a2 >= ball.sa) {
+        return seg.number;
+      }
+    }
+    return -1;
+  }
+};
 
 var rouletteSpinner = {
-	intervalMs: 10,
-	intervalAngle: 6,
-	ballAngle: 10,
-	ballRadius: 0.025, // ratio of ball position to wheel, > 1. represents sufficient velocity
-	rouletteWheelPaper: null,
-	ballWheelPaper: null,
-	lastId: null,
-	paused: true,
-	
-	init: function() {
-		var rouletteWheelPaper = Raphael("rouletteWheel", 300, 300);
-		this.rouletteWheelPaper = rouletteWheelPaper;
-		
-		var ballWheelPaper = Raphael("ballWheel", 100, 300);
-		this.ballWheelPaper = ballWheelPaper;
-		
-		roulette.init(rouletteWheelPaper, ballWheelPaper);
-		ball.init(rouletteWheelPaper, ballWheelPaper, roulette);
-		
-		this.next();
-	},
-	
-	doRollBall: function() {
-		ball.render = true;
-	},
-	
-	doTakeBall: function() {
-		ball.reset();
-		setTimeout(function(){
-			ball.reset();
-		}, this.intervalMs);
-		this.doTogglePause();
-	},
-	
-	next: function() {
-		setTimeout(function(){
-			rouletteSpinner.spin();
-		}, this.intervalMs);
-	},
-	
-	doTogglePause: function() {
-		this.paused = !this.paused;
-	},
-	
-	spin: function() {
-		if (!this.paused) {
-			this.spinWheel();
-			this.spinBall();
-		}
-		this.render();
-		this.next();
-	},
-	
-	render: function() {
-		roulette.renderRouletteWheel();
-		roulette.renderBallWheel();
-	},
-	
-	spinWheel: function() {
-		roulette.sa += this.intervalAngle;
-		while (roulette.sa < 0.0) {
-			roulette.sa += 360.0;
-		}
-		while (roulette.sa >= 360.0) {
-			roulette.sa -= 360.0;
-		}
-	},
-	
-	spinBall: function() {
-		if (ball.render) {
-			if (!ball.stopped) {
-				ball.sa -= this.ballAngle;
-				ball.r -= this.ballRadius;
-			}
-			else {
-				ball.sa += this.intervalAngle
-			}
-			
-			while (ball.sa < 0.0) {
-				ball.sa += 360.0;
-			}
-			while (ball.sa >= 360.0) {
-				ball.sa -= 360.0;
-			}
+  intervalMs: 10,
+  intervalAngle: 6,
+  ballAngle: 10,
+  ballRadius: 0.025, // ratio of ball position to wheel, > 1. represents sufficient velocity
+  rouletteWheelPaper: null,
+  ballWheelPaper: null,
+  lastId: null,
+  paused: true,
 
-			if (!ball.stopped) {
-				ball.jumpBall();
-			}
-			
-			while (ball.sa < 0.0) {
-				ball.sa += 360.0;
-			}
-			while (ball.sa >= 360.0) {
-				ball.sa -= 360.0;
-			}
-		}
-	}
+  init: function() {
+    var rouletteWheelPaper = Raphael("rouletteWheel", 300, 300);
+    this.rouletteWheelPaper = rouletteWheelPaper;
+
+    var ballWheelPaper = Raphael("ballWheel", 100, 300);
+    this.ballWheelPaper = ballWheelPaper;
+
+    roulette.init(rouletteWheelPaper, ballWheelPaper);
+    ball.init(rouletteWheelPaper, ballWheelPaper, roulette);
+
+    this.next();
+  },
+
+  doRollBall: function() {
+    ball.render = true;
+  },
+
+  doTakeBall: function() {
+    ball.reset();
+    setTimeout(function() {
+      ball.reset();
+    }, this.intervalMs);
+    this.doTogglePause();
+  },
+
+  next: function() {
+    setTimeout(function() {
+      rouletteSpinner.spin();
+    }, this.intervalMs);
+  },
+
+  doTogglePause: function() {
+    this.paused = !this.paused;
+  },
+
+  spin: function() {
+    if (!this.paused) {
+      this.spinWheel();
+      this.spinBall();
+    }
+    this.render();
+    this.next();
+  },
+
+  render: function() {
+    roulette.renderRouletteWheel();
+    roulette.renderBallWheel();
+  },
+
+  spinWheel: function() {
+    roulette.sa += this.intervalAngle;
+    while (roulette.sa < 0.0) {
+      roulette.sa += 360.0;
+    }
+    while (roulette.sa >= 360.0) {
+      roulette.sa -= 360.0;
+    }
+  },
+
+  spinBall: function() {
+    if (ball.render) {
+      if (!ball.stopped) {
+        ball.sa -= this.ballAngle;
+        ball.r -= this.ballRadius;
+      } else {
+        ball.sa += this.intervalAngle;
+      }
+
+      while (ball.sa < 0.0) {
+        ball.sa += 360.0;
+      }
+      while (ball.sa >= 360.0) {
+        ball.sa -= 360.0;
+      }
+
+      if (!ball.stopped) {
+        ball.jumpBall();
+      }
+
+      while (ball.sa < 0.0) {
+        ball.sa += 360.0;
+      }
+      while (ball.sa >= 360.0) {
+        ball.sa -= 360.0;
+      }
+    }
+  }
 };
-
-// var q=((100/37)*1);
 
 var numberMapping = {
-	0: 0,
-	0.027: 32,
-	0.054:15,
-	0.081:19,
-	0.108:4,
-	0.135:21,
-	0.162:2,
-	0.189:25,
-	0.216:17,
-	0.243:34,
-	0.27:6,
-	0.297:27,
-	0.324:13,
-	0.351:36,
-	0.378:11,
-	0.405:30,
-	0.432:8,
-	0.459:23,
-	0.486:10,
-	0.513:5,
-	0.54:24,
-	0.567:16,
-	0.594:33,
-	0.621:1,
-	0.648:20,
-	0.675:14,
-	0.702:31,
-	0.729:9,
-	0.756:22,
-	0.783:18,
-	0.81:29,
-	0.837:7,
-	0.864:28,
-	0.891:12,
-	0.918:35,
-	0.945:3,
-	0.972:26,
+  0: 0,
+  0.027: 32,
+  0.054: 15,
+  0.081: 19,
+  0.108: 4,
+  0.135: 21,
+  0.162: 2,
+  0.189: 25,
+  0.216: 17,
+  0.243: 34,
+  0.27: 6,
+  0.297: 27,
+  0.324: 13,
+  0.351: 36,
+  0.378: 11,
+  0.405: 30,
+  0.432: 8,
+  0.459: 23,
+  0.486: 10,
+  0.513: 5,
+  0.54: 24,
+  0.567: 16,
+  0.594: 33,
+  0.621: 1,
+  0.648: 20,
+  0.675: 14,
+  0.702: 31,
+  0.729: 9,
+  0.756: 22,
+  0.783: 18,
+  0.81: 29,
+  0.837: 7,
+  0.864: 28,
+  0.891: 12,
+  0.918: 35,
+  0.945: 3,
+  0.972: 26
 };
-
-// var numberMapping = {
-// 	0: 30,
-// 	0.03: 11,
-// 	0.05:7,
-// 	0.08:20,
-// 	0.1:32,
-// 	0.13:17,
-// 	0.16:5,
-// 	0.18:22,
-// 	0.21:34,
-// 	0.23:15,
-// 	0.26:3,
-// 	0.29:24,
-// 	0.31:36,
-// 	0.34:13,
-// 	0.36:1,
-// 	0.39:0,
-// 	0.42:27,
-// 	0.44:10,
-// 	0.47:25,
-// 	0.49:29,
-// 	0.52:12,
-// 	0.55:8,
-// 	0.57:19,
-// 	0.6:31,
-// 	0.62:18,
-// 	0.65:6,
-// 	0.68:21,
-// 	0.7:33,
-// 	0.73:16,
-// 	0.75:4,
-// 	0.78:23,
-// 	0.81:35,
-// 	0.83:14,
-// 	0.86:2,
-// 	0.88:0,
-// 	0.91:28,
-// 	0.94:9,
-// 	0.96:26,
-// };
 
 const backNumberMapping = {};
 
 for (const i in numberMapping) {
-	let val = numberMapping[i];
-	backNumberMapping[val] = i;
+  let val = numberMapping[i];
+  backNumberMapping[val] = i;
 }
 
-
 function showRoulletteWheel() {
-	setTimeout(function(){
-		rouletteSpinner.init();
-	}, 1000);
+  setTimeout(function() {
+    rouletteSpinner.init();
+  }, 1000);
 }
 
 function throwBall(winningNumber) {
-	const number = backNumberMapping[winningNumber];
-	roulette.sa = 0;
-	ball.sa = number*360.0;
-	rouletteSpinner.doRollBall();
-	rouletteSpinner.doTogglePause();
+  const number = backNumberMapping[winningNumber];
+  roulette.sa = 0;
+  ball.sa = number * 360.0;
+  rouletteSpinner.doRollBall();
+  rouletteSpinner.doTogglePause();
 }
 
 function takeBall() {
-	rouletteSpinner.doTakeBall()
+  rouletteSpinner.doTakeBall();
 }
 
-
-
-export {showRoulletteWheel}
-export {throwBall}
-export {takeBall}
+export { showRoulletteWheel };
+export { throwBall };
+export { takeBall };
