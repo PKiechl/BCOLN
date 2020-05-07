@@ -9,8 +9,9 @@ import Bets from "./Bets";
 import Header from "./Header";
 import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
-import { showRoulletteWheel, throwBall, takeBall } from "./roulette";
+import { showRouletteWheel, throwBall, takeBall } from "./roulette";
 import "./roulette.css";
+import Modal from "./modal/Modal";
 
 //RPC server from GANACHE,
 const web3 = new Web3("ws://127.0.0.1:7545");
@@ -38,7 +39,9 @@ class App extends React.Component {
     amount: "",
     bets: [],
     ballStopped: false,
-    wheelLoaded: false
+    wheelLoaded: false,
+    isModalShowing: false,
+    isWheelShowing: false
   };
   constructor(props) {
     super(props);
@@ -52,6 +55,22 @@ class App extends React.Component {
     );
   }
 
+  componentDidMount() {
+    // showRouletteWheel();
+  }
+
+  openModalHandler = () => {
+    this.setState({
+      isShowing: true
+    });
+  };
+
+  closeModalHandler = () => {
+    this.setState({
+      isShowing: false
+    });
+  };
+
   async watchEvents(contract) {
     contract.events.allEvents(
       {
@@ -64,11 +83,10 @@ class App extends React.Component {
         }
         console.log(
           "event arrived.",
-          event.event,
-          event.returnValues.client,
-          event.returnValues.desc
+          event.event
         );
         if (event.event === "LogQueryDone") {
+          console.log("query returned result: ", event.returnValues.result);
           this.callPlay();
         }
         if (event.event === "RouletteDone") {
@@ -92,12 +110,6 @@ class App extends React.Component {
     console.log("called play", result);
   };
 
-  // callContractGet = async event => {
-  //   event.preventDefault();
-  //   const res = await RouletteContract.methods.getResult().call();
-  //   this.setState({ winningNumber: res });
-  // };
-
   setAmount = async amount => {
     await this.setState({ amount: amount });
     console.log(this.state.amount);
@@ -105,7 +117,7 @@ class App extends React.Component {
 
   callSetReady = async event => {
     if (!this.state.wheelLoaded) {
-      showRoulletteWheel();
+      // showRouletteWheel();
       this.setState({ wheelLoaded: true });
     }
 
@@ -216,6 +228,10 @@ class App extends React.Component {
     await this.setState({ address: event });
     console.log("address: ", this.state.address);
     this.getAccountBalance();
+    if (!this.state.isWheelShowing) {
+      showRouletteWheel();
+      await this.setState({ isWheelShowing: true });
+    }
   };
 
   resetCurrentBetState = () => {
@@ -276,19 +292,19 @@ class App extends React.Component {
             <Route exact path="/game">
               <Balance eths={this.state.eths} address={this.state.address} />
 
-              <div className="ui container" style={{ border: "1px red" }}>
-              {/*<div id="rouletteTable">*/}
-                <div id="rouletteWheel"></div>
-                <div id="ballWheel"></div>
-                <div className="clearfix"></div>
-              </div>
-
               <InputBar
                 onFormSubmit={this.setAmount}
                 // val = {this.state.amount}
                 inputText={"enter ether amount to bet"}
                 disabled={this.state.ready || this.state.bet}
               />
+              <div className="ui container" style={{ border: "1px red" }}>
+                {/*<div id="rouletteTable">*/}
+                <div id="rouletteWheel"></div>
+                <div id="ballWheel"></div>
+                <div className="clearfix"></div>
+              </div>
+
               <Bets
                 onClick={this.callBet}
                 disabled={

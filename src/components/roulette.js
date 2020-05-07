@@ -52,15 +52,15 @@ function Segment(c, number, rgb) {
   this.rgb = rgb;
 }
 
-var util = {
-  reverse: function(a1) {
-    var a2 = new Array(a1.length);
-    for (var i = 0; i < a1.length; i++) {
-      a2[a1.length - i - 1] = a1[i];
-    }
-    return a2;
-  }
-};
+// var util = {
+//   reverse: function(a1) {
+//     var a2 = new Array(a1.length);
+//     for (var i = 0; i < a1.length; i++) {
+//       a2[a1.length - i - 1] = a1[i];
+//     }
+//     return a2;
+//   }
+// };
 
 var europeanWheel = [
   "r30",
@@ -544,6 +544,8 @@ var ball = {
     var w = this.detWinningNumber();
     document.dispatchEvent(winningNumberDeterminedEvent);
     console.log("Winner: w[" + w + "]");
+    //
+    rouletteSpinner.doSetPause(true);
   },
   detWinningNumber: function() {
     // search segments for ballangle
@@ -600,7 +602,8 @@ var rouletteSpinner = {
     setTimeout(function() {
       ball.reset();
     }, this.intervalMs);
-    this.doTogglePause();
+    // this.doTogglePause();
+    this.doSetPause(true);
   },
 
   next: function() {
@@ -612,6 +615,11 @@ var rouletteSpinner = {
   doTogglePause: function() {
     this.paused = !this.paused;
   },
+
+  doSetPause: function(choice){
+    this.paused=choice;
+  },
+
 
   spin: function() {
     if (!this.paused) {
@@ -714,10 +722,10 @@ for (const i in numberMapping) {
   backNumberMapping[val] = i;
 }
 
-function showRoulletteWheel() {
-  setTimeout(function() {
+function showRouletteWheel() {
+  // setTimeout(function() {
     rouletteSpinner.init();
-  }, 1000);
+  // }, 50);
 }
 
 function throwBall(winningNumber) {
@@ -725,13 +733,14 @@ function throwBall(winningNumber) {
   roulette.sa = 0;
   ball.sa = number * 360.0;
   rouletteSpinner.doRollBall();
-  rouletteSpinner.doTogglePause();
+  // rouletteSpinner.doTogglePause();
+  rouletteSpinner.doSetPause(false);
 }
 
 function takeBall() {
   rouletteSpinner.doTakeBall();
 }
 
-export { showRoulletteWheel };
+export { showRouletteWheel };
 export { throwBall };
 export { takeBall };
