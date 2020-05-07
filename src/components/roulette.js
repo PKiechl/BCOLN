@@ -135,7 +135,9 @@ var roulette = {
     paper.clear();
 
     // outer path
-    var d0 = 300;
+    // var d0 = 300;
+    var d0 = 400;
+
     var m0 = d0 * 0.01;
     var x0 = d0 / 2;
     var y0 = d0 / 2;
@@ -478,7 +480,9 @@ var ball = {
     // roulette wheel
     var paper = this.rouletteWheelPaper;
 
-    var d = 300;
+    // var d = 300;
+    var d = 400;
+
     var x = d / 2;
     var y = d / 2;
 
@@ -509,7 +513,8 @@ var ball = {
     }
 
     // roulette wheel
-    var paper = this.ballWheelPaper;
+    // var paper = this.ballWheelPaper;
+    var paper=null;
 
     var d = 900;
     var x = d / 2.0;
@@ -572,14 +577,16 @@ var rouletteSpinner = {
   paused: true,
 
   init: function() {
-    var rouletteWheelPaper = Raphael("rouletteWheel", 300, 300);
+    var rouletteWheelPaper = Raphael("rouletteWheel", 400, 400);
     this.rouletteWheelPaper = rouletteWheelPaper;
 
-    var ballWheelPaper = Raphael("ballWheel", 100, 300);
+    var ballWheelPaper = Raphael("ballWheel", 0, 0);
     this.ballWheelPaper = ballWheelPaper;
 
     roulette.init(rouletteWheelPaper, ballWheelPaper);
     ball.init(rouletteWheelPaper, ballWheelPaper, roulette);
+    // roulette.init(rouletteWheelPaper);
+    // ball.init(rouletteWheelPaper, roulette);
 
     this.next();
   },
@@ -617,7 +624,7 @@ var rouletteSpinner = {
 
   render: function() {
     roulette.renderRouletteWheel();
-    roulette.renderBallWheel();
+    // roulette.renderBallWheel();
   },
 
   spinWheel: function() {

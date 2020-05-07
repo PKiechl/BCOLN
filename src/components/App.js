@@ -9,7 +9,8 @@ import Bets from "./Bets";
 import Header from "./Header";
 import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
-import {showRoulletteWheel, throwBall, takeBall} from './roulette'
+import { showRoulletteWheel, throwBall, takeBall } from "./roulette";
+import "./roulette.css";
 
 //RPC server from GANACHE,
 const web3 = new Web3("ws://127.0.0.1:7545");
@@ -37,15 +38,18 @@ class App extends React.Component {
     amount: "",
     bets: [],
     ballStopped: false,
-    wheelLoaded: false,
+    wheelLoaded: false
   };
   constructor(props) {
     super(props);
     this.watchEvents(OracleContract);
     this.watchEvents(RouletteContract);
-    document.addEventListener("winningNumberDetermined", function(e) {
-      this.setState({ ballStopped: true });
-    }.bind(this));
+    document.addEventListener(
+      "winningNumberDetermined",
+      function(e) {
+        this.setState({ ballStopped: true });
+      }.bind(this)
+    );
   }
 
   async watchEvents(contract) {
@@ -70,7 +74,7 @@ class App extends React.Component {
         if (event.event === "RouletteDone") {
           this.setState({ winningNumber: event.returnValues.rng });
           this.getAccountBalance();
-          throwBall(event.returnValues.rng)
+          throwBall(event.returnValues.rng);
         }
       }
     );
@@ -223,7 +227,7 @@ class App extends React.Component {
   replayRoulette = async () => {
     await this.resetRouletteState();
     this.callJoin(this.state.address);
-    takeBall()
+    takeBall();
   };
 
   callLeave = async () => {
@@ -248,7 +252,7 @@ class App extends React.Component {
     this.setState({ amount: "" });
     this.setState({ bets: [] });
     this.setState({ winningNumber: "" });
-    this.setState({ ballStopped: false});
+    this.setState({ ballStopped: false });
   }
 
   getAccountBalance = async () => {
@@ -272,11 +276,11 @@ class App extends React.Component {
             <Route exact path="/game">
               <Balance eths={this.state.eths} address={this.state.address} />
 
-              <div id="rouletteTable">
+              <div className="ui container" style={{ border: "1px red" }}>
+              {/*<div id="rouletteTable">*/}
                 <div id="rouletteWheel"></div>
                 <div id="ballWheel"></div>
                 <div className="clearfix"></div>
-                {/*<div id="chipTable"></div>*/}
               </div>
 
               <InputBar
@@ -324,9 +328,6 @@ class App extends React.Component {
               >
                 back
               </button>
-
-
-
             </Route>
           </div>
         </BrowserRouter>
