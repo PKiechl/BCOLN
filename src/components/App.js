@@ -106,7 +106,7 @@ class App extends React.Component {
           throwBall(event.returnValues.rng);
           setTimeout(() => {
             this.setState({ showModalWon: true });
-          }, 5000);
+          }, 4000);
         }
       }
     );
@@ -365,10 +365,6 @@ class App extends React.Component {
                 </div>
               </div>
               <SubmittedBets bets={this.state.bets} />
-              <div className="ui message" hidden={!this.state.ballStopped}>
-                <div className="header">Winning Number</div>
-                <p>{this.state.winningNumber}</p>
-              </div>
               <button
                 className="ui button"
                 disabled={!this.state.bet || this.state.ready}
@@ -382,13 +378,6 @@ class App extends React.Component {
                 onClick={this.resetCurrentBetState}
               >
                 Place another bet
-              </button>
-              <button
-                className="ui button"
-                disabled={!this.state.ready}
-                onClick={this.replayRoulette}
-              >
-                Replay roulette
               </button>
               <button
                 className="ui button"
