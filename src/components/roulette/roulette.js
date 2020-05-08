@@ -3,9 +3,7 @@
  * Copyright (c) 2010-2015 Jeff D. Conrad
  */
 
-const {
-  Raphael,
-} = require("react-raphael");
+const { Raphael } = require("react-raphael");
 
 const winningNumberDeterminedEvent = new CustomEvent("winningNumberDetermined");
 
@@ -42,7 +40,6 @@ function Segment(c, number, rgb) {
   this.number = number;
   this.rgb = rgb;
 }
-
 
 var europeanWheel = [
   "r30",
@@ -269,8 +266,7 @@ var roulette = {
       ret -= 360.0;
     }
     return ret;
-  },
-
+  }
 };
 
 var ball = {
@@ -281,7 +277,7 @@ var ball = {
   roulette: null,
   render: false,
 
-  init: function(rouletteWheelPaper,  roulette) {
+  init: function(rouletteWheelPaper, roulette) {
     this.rouletteWheelPaper = rouletteWheelPaper;
     this.roulette = roulette;
     this.reset();
@@ -395,7 +391,6 @@ var rouletteSpinner = {
     var rouletteWheelPaper = Raphael("rouletteWheel", 400, 400);
     this.rouletteWheelPaper = rouletteWheelPaper;
 
-
     roulette.init(rouletteWheelPaper);
     ball.init(rouletteWheelPaper, roulette);
     this.next();
@@ -419,11 +414,9 @@ var rouletteSpinner = {
     }, this.intervalMs);
   },
 
-
-  doSetPause: function(choice){
-    this.paused=choice;
+  doSetPause: function(choice) {
+    this.paused = choice;
   },
-
 
   spin: function() {
     if (!this.paused) {

@@ -1,6 +1,6 @@
 import React from "react";
 import InputBar from "./InputBar";
-import {withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 class JoinPage extends React.Component {
   state = { address: "" };
@@ -9,8 +9,10 @@ class JoinPage extends React.Component {
     await this.setState({ address: accAddress });
     console.log("address set: ", this.state.address);
     this.props.onSubmit(this.state.address);
-    this.props.history.push('/game');
+    this.props.history.push("/game");
   };
+
+
 
   render() {
     return (

@@ -14,6 +14,7 @@ import SubmittedBets from "./SubmittedBets";
 import { showRouletteWheel, throwBall, takeBall } from "./roulette/roulette";
 import "./roulette/roulette.css";
 import ModalTable from "./modal/Modal";
+import ModalWon from "./modal/ModalWon";
 
 //RPC server from GANACHE,
 const web3 = new Web3("ws://127.0.0.1:7545");
@@ -43,7 +44,9 @@ class App extends React.Component {
     ballStopped: false,
     wheelLoaded: false,
     isModalShowing: false,
-    isWheelShowing: false
+    isWheelShowing: false,
+    ethsAtJoin: 0,
+    showModalWon: false
   };
   constructor(props) {
     super(props);
@@ -70,7 +73,8 @@ class App extends React.Component {
   };
 
   tearDown = async () => {
-    const account = this.state.address;
+    const accounts = await web3.eth.getAccounts();
+    const account = accounts[0];
     const res = await RouletteContract.methods.teardown();
     await res.estimateGas();
     const result = await res.send({
@@ -100,12 +104,15 @@ class App extends React.Component {
           this.setState({ winningNumber: event.returnValues.rng });
           this.getAccountBalance();
           throwBall(event.returnValues.rng);
+          setTimeout(() => {
+            this.setState({ showModalWon: true });
+          }, 5000);
         }
       }
     );
   }
 
-  callPlay = async event => {
+  callPlay = async () => {
     const account = this.state.address;
     const res = await RouletteContract.methods.playRoulette();
     await res.estimateGas();
@@ -234,7 +241,8 @@ class App extends React.Component {
 
     await this.setState({ address: event });
     console.log("address: ", this.state.address);
-    this.getAccountBalance();
+
+    this.getAccountBalance(true);
     if (!this.state.isWheelShowing) {
       showRouletteWheel();
       await this.setState({ isWheelShowing: true });
@@ -257,6 +265,8 @@ class App extends React.Component {
     await this.resetRouletteState();
     window.history.back();
     console.log("leave/back");
+    await this.setState({ address: null });
+    await this.setState({isWheelShowing:false});
   };
 
   async resetRouletteState() {
@@ -276,14 +286,20 @@ class App extends React.Component {
     this.setState({ bets: [] });
     this.setState({ winningNumber: "" });
     this.setState({ ballStopped: false });
+    this.setState({ showModalWon: false });
   }
 
-  getAccountBalance = async () => {
+  getAccountBalance = async (join = false) => {
     if (this.state.address) {
       const balance = await web3.eth.getBalance(this.state.address);
       const eths = await web3.utils.fromWei(balance.toString(), "ether");
       await this.setState({ eths: eths });
+      if (join) {
+        await this.setState({ ethsAtJoin: eths });
+        console.log("ethsAtJoin: ", this.state.ethsAtJoin);
+      }
       console.log("eths", this.state.eths);
+      return eths;
     }
   };
 
@@ -323,8 +339,8 @@ class App extends React.Component {
                       <div
                         id="rouletteWheel"
                         style={{ display: "flex", justifyContent: "center" }}
-                      ></div>
-                      <div className="clearfix"></div>
+                      />
+                      <div className="clearfix" />
                       <ModalTable />
                       <Bets3
                         onClick={this.callBet}
@@ -384,6 +400,13 @@ class App extends React.Component {
               <button className="ui button" onClick={this.tearDown}>
                 testing:tearDown
               </button>
+              <ModalWon
+                rng={this.state.winningNumber}
+                show={this.state.showModalWon}
+                amountWon={this.state.eths - this.state.ethsAtJoin}
+                back={this.callLeave}
+                replay={this.replayRoulette}
+              />
             </Route>
           </div>
         </BrowserRouter>
