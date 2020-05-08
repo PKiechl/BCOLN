@@ -41,7 +41,6 @@ class BetsLeft extends React.Component {
     }
   };
 
-
   resetState = async () => {
     // reset state to properly change the ui for consecutive bets when using
     // place another bet in App.js
@@ -60,6 +59,7 @@ class BetsLeft extends React.Component {
     if (this.state.type === "1nr") {
       if (this.state.nr1 !== "") {
         this.setState({ ready: true });
+        this.setState({ nr2: "", nr3: "", nr4: "" });
       } else {
         this.setState({ ready: false });
       }
@@ -67,6 +67,7 @@ class BetsLeft extends React.Component {
     if (this.state.type === "2nr") {
       if (this.state.nr1 !== "" && this.state.nr2 !== "") {
         this.setState({ ready: true });
+        this.setState({ nr3: "", nr4: "" });
       } else {
         this.setState({ ready: false });
       }
@@ -87,70 +88,164 @@ class BetsLeft extends React.Component {
 
   singleNumCheck = () => {
     // check validity of a simple numerical bet
-    if (this.state.type === "1nr") {
-      if (this.state.nr1 < 0 || this.state.nr1 > 36) {
-        alert("Invalid Number entered. Please enter a numbers from 0 to 36!");
-        this.setState({ nr1: "" });
-        return false;
-      }
+    // 0 allowed as single bet
+    if (this.state.nr1 < 0 || this.state.nr1 > 36) {
+      alert("Invalid Number entered. Please enter a numbers from 0 to 36!");
+      this.setState({ nr1: "" });
+      return false;
     }
     return true;
   };
 
   twoComboCheck = () => {
     // check validity of a 2 combo numerical bet
-    if (this.state.type === "2nr") {
-      // individual validity checks
-      if (this.state.nr1 > 36 || this.state.nr1 < 1) {
-        alert("Please enter a number between 1 and 36 for your first number!");
-        this.setState({ nr1: "" });
-        return false;
-      }
-      if (this.state.nr2 > 36 || this.state.nr2 < 1) {
-        alert("Please enter a number between 1 and 36 for your second number!");
-        this.setState({ nr2: "" });
-        return false;
-      }
-      // TODO: valid combo logic... would require actual roulette field in UI
-      //  otherwise how is the user to know which combos are valid
+    // individual validity checks
+    if (this.state.nr1 > 36 || this.state.nr1 < 1) {
+      alert("Please enter a number between 1 and 36 for your first number!");
+      this.setState({ nr1: "" });
+      return false;
     }
-    return true;
-  };
-
-  fourComboCheck = () => {
-    if (this.state.type === "4nr") {
-      // individual validity checks
-      if (this.state.nr1 > 36 || this.state.nr1 < 1) {
-        alert("Please enter a number between 1 and 36 for your first number!");
-        this.setState({ nr1: "" });
-        return false;
-      }
-      if (this.state.nr2 > 36 || this.state.nr2 < 1) {
-        alert("Please enter a number between 1 and 36 for your second number!");
-        this.setState({ nr2: "" });
-        return false;
-      }
-      if (this.state.nr3 > 36 || this.state.nr3 < 1) {
-        alert("Please enter a number between 1 and 36 for your third number!");
-        this.setState({ nr3: "" });
-        return false;
-      }
-      if (this.state.nr4 > 36 || this.state.nr4 < 1) {
-        alert("Please enter a number between 1 and 36 for your fourth number!");
-        this.setState({ nr4: "" });
-        return false;
-      }
+    if (this.state.nr2 > 36 || this.state.nr2 < 1) {
+      alert("Please enter a number between 1 and 36 for your second number!");
+      this.setState({ nr2: "" });
+      return false;
     }
+    if (this.state.nr1 === this.state.nr2) {
+      alert("Please bet on distinct numbers!");
+      return false;
+    }
+    // let betsSorted = [
+    //   this.state.nr1,
+    //   this.state.nr2,
+    // ];
+    // betsSorted.sort();
+    // await this.setState({
+    //   nr1: betsSorted[0],
+    //   nr2: betsSorted[1],
+    // });
     // TODO: valid combo logic... would require actual roulette field in UI
     //  otherwise how is the user to know which combos are valid
     return true;
   };
 
+  fourComboCheck = () => {
+    // check validity of a 4 combo numerical bet
+    if (this.state.nr1 > 36 || this.state.nr1 < 1) {
+      alert("Please enter a number between 1 and 36 for your first number!");
+      this.setState({ nr1: "" });
+      return false;
+    }
+    if (this.state.nr2 > 36 || this.state.nr2 < 1) {
+      alert("Please enter a number between 1 and 36 for your second number!");
+      this.setState({ nr2: "" });
+      return false;
+    }
+    if (this.state.nr3 > 36 || this.state.nr3 < 1) {
+      alert("Please enter a number between 1 and 36 for your third number!");
+      this.setState({ nr3: "" });
+      return false;
+    }
+    if (this.state.nr4 > 36 || this.state.nr4 < 1) {
+      alert("Please enter a number between 1 and 36 for your fourth number!");
+      this.setState({ nr4: "" });
+      return false;
+    }
+    if (
+      this.state.nr3 === this.state.nr4 ||
+      this.state.nr1 === this.state.nr3 ||
+      this.state.nr1 === this.state.nr4 ||
+      this.state.nr2 === this.state.nr3 ||
+      this.state.nr2 === this.state.nr4 ||
+      this.state.nr1 === this.state.nr2
+    ) {
+      alert("Please bet on distinct numbers!");
+      return false;
+    }
+
+    // TODO: valid combo logic... would require actual roulette field in UI
+    //  otherwise how is the user to know which combos are valid
+    return true;
+  };
+
+  validate2combo = () => {
+    let betsSorted = [this.state.nr1, this.state.nr2];
+    betsSorted.sort((a, b) => a - b);
+    this.setState({
+      nr1: betsSorted[0],
+      nr2: betsSorted[1]
+    });
+    console.log(betsSorted[0]);
+    console.log(betsSorted[1]);
+
+    if (
+      parseInt(betsSorted[0]) % 3 === 0 &&
+      parseInt(betsSorted[1]) !== parseInt(betsSorted[0]) + 3
+    ) {
+      alert("Please enter a valid combination of numbers");
+      return false;
+    }
+    if (
+      parseInt(betsSorted[0]) + 1 !== parseInt(betsSorted[1]) &&
+      parseInt(betsSorted[0]) + 3 !== parseInt(betsSorted[1])
+    ) {
+      alert("Please enter a valid combination of numbers");
+      return false;
+    } else {
+      console.log("validate4combo valid");
+      return true;
+    }
+  };
+
+  validate4combo = () => {
+    console.log("validate4combo");
+    let bets1 = [
+      this.state.nr1,
+      this.state.nr2,
+      this.state.nr3,
+      this.state.nr4
+    ];
+    let betsSorted = bets1.sort((a, b) => a - b);
+    this.setState({
+      nr1: betsSorted[0],
+      nr2: betsSorted[1],
+      nr3: betsSorted[2],
+      nr4: betsSorted[3]
+    });
+
+    if (parseInt(betsSorted[0]) % 3 === 0) {
+      alert("Please enter a valid combination of numbers");
+      return false;
+    } else if (
+      parseInt(betsSorted[0]) + 1 === parseInt(betsSorted[1]) &&
+      parseInt(betsSorted[0]) + 3 === parseInt(betsSorted[2]) &&
+      parseInt(betsSorted[0]) + 4 === parseInt(betsSorted[3])
+    ) {
+      console.log("validate4combo valid");
+      return true;
+    } else {
+      alert("Please enter a valid combination of numbers");
+      return false;
+    }
+  };
+
   validateNumbers = () => {
     // checks if numerical bets adhere to the rules of the game
-    return (
-      this.singleNumCheck() && this.twoComboCheck() && this.fourComboCheck()
-    );
+
+    if (this.state.type === "4nr") {
+      if (this.fourComboCheck()) {
+        console.log("4combocheck valid");
+        return this.validate4combo();
+      } else return false;
+    }
+    if (this.state.type === "2nr") {
+      if (this.twoComboCheck()) {
+        return this.validate2combo();
+      } else return false;
+    }
+    if (this.state.type === "1nr") {
+      return this.singleNumCheck();
+    }
+    return true;
   };
 
   receiver = async (id, num) => {

@@ -523,7 +523,9 @@ function showRouletteWheel() {
 }
 
 function throwBall(winningNumber) {
+  console.log("roulettejs", winningNumber);
   const number = backNumberMapping[winningNumber];
+  console.log("number", number);
   roulette.sa = 0;
   ball.sa = number * 360.0;
   rouletteSpinner.doRollBall();

@@ -59,17 +59,17 @@ class App extends React.Component {
     );
   }
 
-  openModalHandler = () => {
-    this.setState({
-      isModalShowing: true
-    });
-  };
-
-  closeModalHandler = () => {
-    this.setState({
-      isModalShowing: false
-    });
-  };
+  // openModalHandler = () => {
+  //   this.setState({
+  //     isModalShowing: true
+  //   });
+  // };
+  //
+  // closeModalHandler = () => {
+  //   this.setState({
+  //     isModalShowing: false
+  //   });
+  // };
 
   tearDown = async () => {
     const accounts = await web3.eth.getAccounts();
@@ -134,7 +134,7 @@ class App extends React.Component {
       this.setState({ wheelLoaded: true });
     }
 
-    event.preventDefault();
+    // event.preventDefault();
     const account = this.state.address;
     const res = await RouletteContract.methods.setReady();
     await res.estimateGas();
@@ -329,14 +329,6 @@ class App extends React.Component {
                         this.state.bet
                       }
                     />
-                    {/*<Bets3*/}
-                    {/*    onClick={this.callBet}*/}
-                    {/*    disabled={*/}
-                    {/*      this.state.amount === "" ||*/}
-                    {/*      this.state.ready ||*/}
-                    {/*      this.state.bet*/}
-                    {/*    }*/}
-                    {/*/>*/}
                   </div>
                   <div
                     className="column"
