@@ -1,15 +1,21 @@
 import React from "react";
 import NumberField from "../NumberField";
+import { Button, Header, Icon } from "semantic-ui-react";
+import Modal from "semantic-ui-react/dist/commonjs/modules/Modal";
 
-class Bets3 extends React.Component {
+class BetsLeft extends React.Component {
   state = {
     type: null,
     nr1: "",
     nr2: "",
     nr3: "",
     nr4: "",
-    ready: false
+    ready: false,
+    open: false
   };
+
+  open = () => this.setState({ open: true });
+  close = () => this.setState({ open: false });
 
   onSubmit = async type => {
     // the bet with the type specified on the selected button is "returned" to the app
@@ -29,10 +35,12 @@ class Bets3 extends React.Component {
         this.state.nr3,
         this.state.nr4
       );
+      this.close();
       // bet successful TODO: might need better checking
       this.resetState();
     }
   };
+
 
   resetState = async () => {
     // reset state to properly change the ui for consecutive bets when using
@@ -49,21 +57,21 @@ class Bets3 extends React.Component {
     console.log("numerical bet type:", this.state.type);
     // check if the necessary amount of numbers per betType are set
     // also checks upon changing betType and resets ready state if needed
-    if (this.state.type === "1num") {
+    if (this.state.type === "1nr") {
       if (this.state.nr1 !== "") {
         this.setState({ ready: true });
       } else {
         this.setState({ ready: false });
       }
     }
-    if (this.state.type === "2combo") {
+    if (this.state.type === "2nr") {
       if (this.state.nr1 !== "" && this.state.nr2 !== "") {
         this.setState({ ready: true });
       } else {
         this.setState({ ready: false });
       }
     }
-    if (this.state.type === "4combo") {
+    if (this.state.type === "4nr") {
       if (
         this.state.nr1 !== "" &&
         this.state.nr2 !== "" &&
@@ -79,7 +87,7 @@ class Bets3 extends React.Component {
 
   singleNumCheck = () => {
     // check validity of a simple numerical bet
-    if (this.state.type === "1num") {
+    if (this.state.type === "1nr") {
       if (this.state.nr1 < 0 || this.state.nr1 > 36) {
         alert("Invalid Number entered. Please enter a numbers from 0 to 36!");
         this.setState({ nr1: "" });
@@ -91,7 +99,7 @@ class Bets3 extends React.Component {
 
   twoComboCheck = () => {
     // check validity of a 2 combo numerical bet
-    if (this.state.type === "2combo") {
+    if (this.state.type === "2nr") {
       // individual validity checks
       if (this.state.nr1 > 36 || this.state.nr1 < 1) {
         alert("Please enter a number between 1 and 36 for your first number!");
@@ -110,7 +118,7 @@ class Bets3 extends React.Component {
   };
 
   fourComboCheck = () => {
-    if (this.state.type === "4combo") {
+    if (this.state.type === "4nr") {
       // individual validity checks
       if (this.state.nr1 > 36 || this.state.nr1 < 1) {
         alert("Please enter a number between 1 and 36 for your first number!");
@@ -162,8 +170,10 @@ class Bets3 extends React.Component {
   };
 
   render() {
+    const { open } = this.state;
+
     let numField = null;
-    if (this.state.type === "4combo") {
+    if (this.state.type === "4nr") {
       numField = (
         <div>
           <div>
@@ -189,18 +199,20 @@ class Bets3 extends React.Component {
             />
           </div>
           <div>
-            <button
+            <Button
+              color="green"
               disabled={!this.state.ready}
               className="ui button"
-              onClick={() => this.onSubmit("4combo")}
+              onClick={() => this.onSubmit("4nr")}
             >
+              <Icon name="right chevron" />
               submit numbers
-            </button>
+            </Button>
           </div>
         </div>
       );
     }
-    if (this.state.type === "2combo") {
+    if (this.state.type === "2nr") {
       numField = (
         <div>
           <div>
@@ -216,18 +228,20 @@ class Bets3 extends React.Component {
             />
           </div>
           <div>
-            <button
+            <Button
+              color="green"
               disabled={!this.state.ready}
               className="ui button"
-              onClick={() => this.onSubmit("2combo")}
+              onClick={() => this.onSubmit("2nr")}
             >
+              <Icon name="right chevron" />
               submit numbers
-            </button>
+            </Button>
           </div>
         </div>
       );
     }
-    if (this.state.type === "1num") {
+    if (this.state.type === "1nr") {
       numField = (
         <div>
           <div>
@@ -238,54 +252,132 @@ class Bets3 extends React.Component {
             />
           </div>
           <div>
-            <button
+            <Button
+              color="green"
               disabled={!this.state.ready}
               className="ui button"
-              onClick={() => this.onSubmit("1num")}
+              onClick={() => this.onSubmit("1nr")}
             >
+              <Icon name="right chevron" />
               submit numbers
-            </button>
+            </Button>
           </div>
         </div>
       );
     }
 
     return (
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={async () => {
-            await this.setState({ type: "1num" });
-            this.numberCountCheck();
+      <div>
+        <div
+          style={{
+            flexDirection: "column",
+            display: "flex",
+            width: "45%",
+            marginLeft: "0",
+            marginRight: "auto"
           }}
         >
-          1NR
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={async () => {
-            await this.setState({ type: "2combo" });
-            this.numberCountCheck();
-          }}
-        >
-          2NR
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={async () => {
-            await this.setState({ type: "4combo" });
-            this.numberCountCheck();
-          }}
-        >
-          4NR
-        </button>
-        {numField}
+          <button
+            className="ui button"
+            disabled={this.props.disabled}
+            onClick={() => this.onSubmit("black")}
+            style={{ marginBottom: "15px" }}
+          >
+            BLACK
+          </button>
+          <button
+            className="ui button"
+            disabled={this.props.disabled}
+            onClick={() => this.onSubmit("red")}
+            style={{ marginBottom: "15px" }}
+          >
+            RED
+          </button>
+          <button
+            className="ui button"
+            disabled={this.props.disabled}
+            onClick={() => this.onSubmit("even")}
+            style={{ marginBottom: "15px" }}
+          >
+            EVEN
+          </button>
+          <button
+            className="ui button"
+            disabled={this.props.disabled}
+            onClick={() => this.onSubmit("odd")}
+            style={{ marginBottom: "15px" }}
+          >
+            ODD
+          </button>
+          <button
+            className="ui button"
+            disabled={this.props.disabled}
+            onClick={() => this.onSubmit("1-18")}
+            style={{ marginBottom: "15px" }}
+          >
+            1-18
+          </button>
+          <button
+            className="ui button"
+            disabled={this.props.disabled}
+            onClick={() => this.onSubmit("19-36")}
+            style={{ marginBottom: "15px" }}
+          >
+            19-36
+          </button>
+          <Modal
+            open={open}
+            onOpen={this.open}
+            onClose={this.close}
+            size="small"
+            trigger={
+              <button className="ui button" disabled={this.props.disabled}>
+                NUMBERS <Icon name="right chevron" />
+              </button>
+            }
+          >
+            <Header>
+              <Icon name="edit" />
+              Bet on Numbers
+            </Header>
+            <Modal.Content style={{ height: "150px" }}>
+              <button
+                className="ui button"
+                disabled={this.props.disabled}
+                onClick={async () => {
+                  await this.setState({ type: "1nr" });
+                  this.numberCountCheck();
+                }}
+              >
+                1NR
+              </button>
+              <button
+                className="ui button"
+                disabled={this.props.disabled}
+                onClick={async () => {
+                  await this.setState({ type: "2nr" });
+                  this.numberCountCheck();
+                }}
+              >
+                2NR
+              </button>
+              <button
+                className="ui button"
+                disabled={this.props.disabled}
+                onClick={async () => {
+                  await this.setState({ type: "4nr" });
+                  this.numberCountCheck();
+                }}
+              >
+                4NR
+              </button>
+              {numField}
+            </Modal.Content>
+          </Modal>
+        </div>
       </div>
     );
   }
 }
 
-export default Bets3;
+export default BetsLeft;

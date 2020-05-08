@@ -1,7 +1,7 @@
 import React from "react";
 import NumberField from "../NumberField";
 
-class Bets2 extends React.Component {
+class BetsRight extends React.Component {
   state = {
     type: null,
     nr1: "",
@@ -10,8 +10,6 @@ class Bets2 extends React.Component {
     nr4: "",
     ready: false
   };
-
-
 
   onSubmit = async type => {
     // the bet with the type specified on the selected button is "returned" to the app
@@ -39,57 +37,60 @@ class Bets2 extends React.Component {
 
   render() {
     return (
-      <div style={{ flexDirection: "column", display: "flex", width: "50%", marginLeft:"auto", marginRight:"0", }}>
+      <div
+        style={{
+          flexDirection: "column",
+          display: "flex",
+          width: "45%",
+          marginLeft: "auto",
+          marginRight: "0"
+        }}
+      >
         <button
           className="ui button"
           disabled={this.props.disabled}
-          onClick={() => this.onSubmit("firstDozen")}
-          style={{marginBottom:"15px"}}
+          onClick={() => this.onSubmit("1st 12")}
+          style={{ marginBottom: "15px" }}
         >
           1ST 12
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
-          onClick={() => this.onSubmit("secondDozen")}
-          style={{marginBottom:"15px"}}
-
+          onClick={() => this.onSubmit("2nd 12")}
+          style={{ marginBottom: "15px" }}
         >
           2ND 12
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
-          onClick={() => this.onSubmit("thirdDozen")}
-          style={{marginBottom:"15px"}}
-
+          onClick={() => this.onSubmit("3rd 12")}
+          style={{ marginBottom: "15px" }}
         >
           3RD 12
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
-          onClick={() => this.onSubmit("col1")}
-          style={{marginBottom:"15px"}}
-
+          onClick={() => this.onSubmit("1st column")}
+          style={{ marginBottom: "15px" }}
         >
           1ST COLUMN
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
-          onClick={() => this.onSubmit("col2")}
-          style={{marginBottom:"15px"}}
-
+          onClick={() => this.onSubmit("2nd column")}
+          style={{ marginBottom: "15px" }}
         >
           2ND COLUMN
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
-          onClick={() => this.onSubmit("col3")}
-          style={{marginBottom:"15px"}}
-
+          onClick={() => this.onSubmit("3rd column")}
+          style={{ marginBottom: "15px" }}
         >
           3RD COLUMN
         </button>
@@ -98,4 +99,4 @@ class Bets2 extends React.Component {
   }
 }
 
-export default Bets2;
+export default BetsRight;

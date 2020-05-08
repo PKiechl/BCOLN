@@ -5,9 +5,8 @@ import data from "../truffle/build/contracts/roulette.json";
 import oracleData from "../truffle/build/contracts/Oracle.json";
 import { BrowserRouter, Route } from "react-router-dom";
 import JoinPage from "./JoinPage";
-import Bets from "./bets/Bets";
-import Bets2 from "./bets/Bets2";
-import Bets3 from "./bets/Bets3";
+import BetsRight from "./bets/BetsRight";
+import BetsLeft from "./bets/BetsLeft";
 import Header from "./Header";
 import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
@@ -169,37 +168,37 @@ class App extends React.Component {
       case "odd":
         res = await RouletteContract.methods.betOdd();
         break;
-      case "firstDozen":
+      case "1st 12":
         res = await RouletteContract.methods.betFirstDozen();
         break;
-      case "secondDozen":
+      case "2nd 12":
         res = await RouletteContract.methods.betSecondDozen();
         break;
-      case "thirdDozen":
+      case "3rd 12":
         res = await RouletteContract.methods.betThirdDozen();
         break;
-      case "1to18":
+      case "1-18":
         res = await RouletteContract.methods.bet1to18();
         break;
-      case "19to36":
+      case "19-36":
         res = await RouletteContract.methods.bet19to36();
         break;
-      case "col1":
+      case "1st column":
         res = await RouletteContract.methods.betCol1();
         break;
-      case "col2":
+      case "2nd column":
         res = await RouletteContract.methods.betCol2();
         break;
-      case "col3":
+      case "3rd column":
         res = await RouletteContract.methods.betCol3();
         break;
-      case "1num":
+      case "1nr":
         res = await RouletteContract.methods.betNumber(nr1);
         break;
-      case "2combo":
+      case "2nr":
         res = await RouletteContract.methods.betSplit(nr1, nr2);
         break;
-      case "4combo":
+      case "4nr":
         res = await RouletteContract.methods.betComboFour(nr1, nr2, nr3, nr4);
         break;
     }
@@ -322,7 +321,7 @@ class App extends React.Component {
               <div className="ui grid">
                 <div className="three column row">
                   <div className="ui column">
-                    <Bets
+                    <BetsLeft
                       onClick={this.callBet}
                       disabled={
                         this.state.amount === "" ||
@@ -330,6 +329,14 @@ class App extends React.Component {
                         this.state.bet
                       }
                     />
+                    {/*<Bets3*/}
+                    {/*    onClick={this.callBet}*/}
+                    {/*    disabled={*/}
+                    {/*      this.state.amount === "" ||*/}
+                    {/*      this.state.ready ||*/}
+                    {/*      this.state.bet*/}
+                    {/*    }*/}
+                    {/*/>*/}
                   </div>
                   <div
                     className="column"
@@ -342,18 +349,11 @@ class App extends React.Component {
                       />
                       <div className="clearfix" />
                       <ModalTable />
-                      <Bets3
-                        onClick={this.callBet}
-                        disabled={
-                          this.state.amount === "" ||
-                          this.state.ready ||
-                          this.state.bet
-                        }
-                      />
+
                     </div>
                   </div>
                   <div className="column">
-                    <Bets2
+                    <BetsRight
                       onClick={this.callBet}
                       disabled={
                         this.state.amount === "" ||

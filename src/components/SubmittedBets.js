@@ -18,7 +18,7 @@ class SubmittedBets extends React.Component {
             }
             numbers = numbers.join(", ");
             if (numbers !== "") {
-              numbers = ` - numbers: ${numbers}`;
+              numbers = ` - ${numbers}`;
             }
 
             return (
