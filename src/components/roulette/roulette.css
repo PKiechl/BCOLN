@@ -1,0 +1,23 @@
+/* Styles for the roulette application */
+
+#rouletteWheel {
+    /*border: 1px solid black;*/
+    float: left;
+    height: 400px;
+    position: relative;
+    width: 400px;
+    font-size: 200%;
+    font-weight:bold;
+}
+#ballWheel {
+    border: 1px solid #e0e0e0;
+    float: left;
+    height: 1px;
+    width: 1px;
+    position: relative;
+    /*margin-left: 10px;*/
+    background-color: blue;
+}
+.clearfix {
+    clear: both;
+}

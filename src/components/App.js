@@ -5,12 +5,14 @@ import data from "../truffle/build/contracts/roulette.json";
 import oracleData from "../truffle/build/contracts/Oracle.json";
 import { BrowserRouter, Route } from "react-router-dom";
 import JoinPage from "./JoinPage";
-import Bets from "./Bets";
+import Bets from "./bets/Bets";
+import Bets2 from "./bets/Bets2";
+import Bets3 from "./bets/Bets3";
 import Header from "./Header";
 import Balance from "./Balance";
 import SubmittedBets from "./SubmittedBets";
-import { showRouletteWheel, throwBall, takeBall } from "./roulette";
-import "./roulette.css";
+import { showRouletteWheel, throwBall, takeBall } from "./roulette/roulette";
+import "./roulette/roulette.css";
 import ModalTable from "./modal/Modal";
 
 //RPC server from GANACHE,
@@ -65,6 +67,18 @@ class App extends React.Component {
     this.setState({
       isModalShowing: false
     });
+  };
+
+  tearDown = async () => {
+    const account = this.state.address;
+    const res = await RouletteContract.methods.teardown();
+    await res.estimateGas();
+    const result = await res.send({
+      from: account,
+      gasPrice: 2000,
+      gasLimit: "500000"
+    });
+    console.log("called teardown", result);
   };
 
   async watchEvents(contract) {
@@ -284,28 +298,56 @@ class App extends React.Component {
             </Route>
             <Route exact path="/game">
               <Balance eths={this.state.eths} address={this.state.address} />
-              <div>
-                <ModalTable />
-              </div>
-
-              <div className="ui container" style={{ border: "1px red" }}>
-                <div id="rouletteWheel"></div>
-                <div id="ballWheel"></div>
-                <div className="clearfix"></div>
-              </div>
-
               <InputBar
                 onFormSubmit={this.setAmount}
                 inputText={"enter ether amount to bet"}
                 disabled={this.state.ready || this.state.bet}
               />
-
-              <Bets
-                onClick={this.callBet}
-                disabled={
-                  this.state.amount === "" || this.state.ready || this.state.bet
-                }
-              />
+              <div className="ui grid">
+                <div className="three column row">
+                  <div className="ui column">
+                    <Bets
+                      onClick={this.callBet}
+                      disabled={
+                        this.state.amount === "" ||
+                        this.state.ready ||
+                        this.state.bet
+                      }
+                    />
+                  </div>
+                  <div
+                    className="column"
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <div>
+                      <div
+                        id="rouletteWheel"
+                        style={{ display: "flex", justifyContent: "center" }}
+                      ></div>
+                      <div className="clearfix"></div>
+                      <ModalTable />
+                      <Bets3
+                        onClick={this.callBet}
+                        disabled={
+                          this.state.amount === "" ||
+                          this.state.ready ||
+                          this.state.bet
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="column">
+                    <Bets2
+                      onClick={this.callBet}
+                      disabled={
+                        this.state.amount === "" ||
+                        this.state.ready ||
+                        this.state.bet
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
               <SubmittedBets bets={this.state.bets} />
               <div className="ui message" hidden={!this.state.ballStopped}>
                 <div className="header">Winning Number</div>
@@ -338,6 +380,9 @@ class App extends React.Component {
                 onClick={this.callLeave}
               >
                 back
+              </button>
+              <button className="ui button" onClick={this.tearDown}>
+                testing:tearDown
               </button>
             </Route>
           </div>

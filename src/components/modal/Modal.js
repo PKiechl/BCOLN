@@ -11,31 +11,39 @@ class ModalTable extends Component {
     const { open } = this.state;
 
     return (
-      <Modal
-        open={open}
-        onOpen={this.open}
-        onClose={this.close}
-        size="tiny"
-        trigger={
-          <Button primary icon>
-            Show Roulette Table <Icon name="right chevron" />
-          </Button>
-        }
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingBottom: "20px"
+        }}
       >
-        <Modal.Header>Roulette Table</Modal.Header>
-        <Modal.Content>
-          <div>
-            <Image
-              centered
-              size="large"
-              src="https://www.junkets.ca/gaming/roulette.jpg"
-            />
-          </div>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button icon="check" content="Close" onClick={this.close} />
-        </Modal.Actions>
-      </Modal>
+        <Modal
+          open={open}
+          onOpen={this.open}
+          onClose={this.close}
+          size="tiny"
+          trigger={
+            <Button primary icon style={{ backgroundColor: "black" }}>
+              Show Roulette Table <Icon name="right chevron" />
+            </Button>
+          }
+        >
+          <Modal.Header>Roulette Table</Modal.Header>
+          <Modal.Content>
+            <div>
+              <Image
+                centered
+                size="large"
+                src="https://www.junkets.ca/gaming/roulette.jpg"
+              />
+            </div>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button icon="check" content="Close" onClick={this.close} />
+          </Modal.Actions>
+        </Modal>
+      </div>
     );
   }
 }

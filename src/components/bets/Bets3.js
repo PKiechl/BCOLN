@@ -1,27 +1,18 @@
 import React from "react";
-import NumberField from "./NumberField";
+import NumberField from "../NumberField";
 
-class Bets extends React.Component {
+class Bets3 extends React.Component {
   state = {
     type: null,
     nr1: "",
     nr2: "",
     nr3: "",
     nr4: "",
-    ready: false,
+    ready: false
   };
 
-  // resetNumbers = async () => {
-  //   // TODO: KEEP THIS - if we want to clear the fields when changing numerical bet types we need this -> also call from onClick on betButtons
-  //   // clears the state if the type of numerical bet is changed by clicking the
-  //   // corresponding button
-  //   await this.setState({ nr1: "" });
-  //   await this.setState({ nr2: "" });
-  //   await this.setState({ nr3: "" });
-  //   await this.setState({ nr4: "" });
-  // };
 
-  onSubmit = async (type) => {
+  onSubmit = async type => {
     // the bet with the type specified on the selected button is "returned" to the app
     // the numbers come form the NumberFields and are handled by the receiver function
     await console.log(
@@ -31,7 +22,7 @@ class Bets extends React.Component {
       this.state.nr4
     );
 
-    if(this.validateNumbers()) {
+    if (this.validateNumbers()) {
       await this.props.onClick(
         type,
         this.state.nr1,
@@ -47,12 +38,12 @@ class Bets extends React.Component {
   resetState = async () => {
     // reset state to properly change the ui for consecutive bets when using
     // place another bet in App.js
-    await this.setState({type: null});
-    await this.setState({nr1: ""});
-    await this.setState({nr2: ""});
-    await this.setState({nr3: ""});
-    await this.setState({nr4: ""});
-    await this.setState({ready: false});
+    await this.setState({ type: null });
+    await this.setState({ nr1: "" });
+    await this.setState({ nr2: "" });
+    await this.setState({ nr3: "" });
+    await this.setState({ nr4: "" });
+    await this.setState({ ready: false });
   };
 
   numberCountCheck = () => {
@@ -92,7 +83,7 @@ class Bets extends React.Component {
     if (this.state.type === "1num") {
       if (this.state.nr1 < 0 || this.state.nr1 > 36) {
         alert("Invalid Number entered. Please enter a numbers from 0 to 36!");
-        this.setState({nr1: ""});
+        this.setState({ nr1: "" });
         return false;
       }
     }
@@ -105,12 +96,12 @@ class Bets extends React.Component {
       // individual validity checks
       if (this.state.nr1 > 36 || this.state.nr1 < 1) {
         alert("Please enter a number between 1 and 36 for your first number!");
-        this.setState({nr1: ""});
+        this.setState({ nr1: "" });
         return false;
       }
       if (this.state.nr2 > 36 || this.state.nr2 < 1) {
         alert("Please enter a number between 1 and 36 for your second number!");
-        this.setState({nr2: ""});
+        this.setState({ nr2: "" });
         return false;
       }
       // TODO: valid combo logic... would require actual roulette field in UI
@@ -124,22 +115,22 @@ class Bets extends React.Component {
       // individual validity checks
       if (this.state.nr1 > 36 || this.state.nr1 < 1) {
         alert("Please enter a number between 1 and 36 for your first number!");
-        this.setState({nr1: ""});
+        this.setState({ nr1: "" });
         return false;
       }
       if (this.state.nr2 > 36 || this.state.nr2 < 1) {
         alert("Please enter a number between 1 and 36 for your second number!");
-        this.setState({nr2: ""});
+        this.setState({ nr2: "" });
         return false;
       }
       if (this.state.nr3 > 36 || this.state.nr3 < 1) {
         alert("Please enter a number between 1 and 36 for your third number!");
-        this.setState({nr3: ""});
+        this.setState({ nr3: "" });
         return false;
       }
       if (this.state.nr4 > 36 || this.state.nr4 < 1) {
         alert("Please enter a number between 1 and 36 for your fourth number!");
-        this.setState({nr4: ""});
+        this.setState({ nr4: "" });
         return false;
       }
     }
@@ -150,7 +141,9 @@ class Bets extends React.Component {
 
   validateNumbers = () => {
     // checks if numerical bets adhere to the rules of the game
-    return this.singleNumCheck() && this.twoComboCheck() && this.fourComboCheck();
+    return (
+      this.singleNumCheck() && this.twoComboCheck() && this.fourComboCheck()
+    );
   };
 
   receiver = async (id, num) => {
@@ -170,8 +163,6 @@ class Bets extends React.Component {
   };
 
   render() {
-    //TODO: add more bet buttons here
-
     let numField = null;
     if (this.state.type === "4combo") {
       numField = (
@@ -261,91 +252,7 @@ class Bets extends React.Component {
     }
 
     return (
-      <div>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("black")}
-        >
-          betBlack
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("red")}
-        >
-          betRed
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("even")}
-        >
-          betEven
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("odd")}
-        >
-          betOdd
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("firstDozen")}
-        >
-          betFirstDozen
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("secondDozen")}
-        >
-          betSecondDozen
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("thirdDozen")}
-        >
-          betThirdDozen
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("1to18")}
-        >
-          bet1to18
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("19to36")}
-        >
-          bet19to36
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("col1")}
-        >
-          betCol1
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("col2")}
-        >
-          betCol2
-        </button>
-        <button
-          className="ui button"
-          disabled={this.props.disabled}
-          onClick={() => this.onSubmit("col3")}
-        >
-          betCol3
-        </button>
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <button
           className="ui button"
           disabled={this.props.disabled}
@@ -377,9 +284,9 @@ class Bets extends React.Component {
           bet 4 combo
         </button>
         {numField}
-      </div>
+       </div>
     );
   }
 }
 
-export default Bets;
+export default Bets3;

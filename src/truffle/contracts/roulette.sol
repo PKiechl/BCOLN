@@ -109,7 +109,7 @@ contract roulette{
         owner.transfer(winningAmount);
     }
 
-    function teardown() private {
+    function teardown() public {
         clientCount=0;
         readyCount=0;
         lastRoundWinningNumber=randomNumber;
