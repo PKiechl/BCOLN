@@ -11,20 +11,18 @@ class Bets extends React.Component {
     ready: false
   };
 
-
-
   onSubmit = async type => {
     // the bet with the type specified on the selected button is "returned" to the app
     // the numbers come form the NumberFields and are handled by the receiver function
-      await this.props.onClick(
-        type,
-        this.state.nr1,
-        this.state.nr2,
-        this.state.nr3,
-        this.state.nr4
-      );
-      // bet successful TODO: might need better checking
-      this.resetState();
+    await this.props.onClick(
+      type,
+      this.state.nr1,
+      this.state.nr2,
+      this.state.nr3,
+      this.state.nr4
+    );
+    // bet successful TODO: might need better checking
+    this.resetState();
   };
 
   resetState = async () => {
@@ -36,48 +34,62 @@ class Bets extends React.Component {
 
   render() {
     return (
-      <div style={{ flexDirection: "column", display: "flex", width:"50%", marginLeft:"0", marginRight:"auto"}}>
+      <div
+        style={{
+          flexDirection: "column",
+          display: "flex",
+          width: "50%",
+          marginLeft: "0",
+          marginRight: "auto"
+        }}
+      >
         <button
           className="ui button"
           disabled={this.props.disabled}
           onClick={() => this.onSubmit("black")}
+          style={{ marginBottom: "15px" }}
         >
-          betBlack
+          BLACK
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
           onClick={() => this.onSubmit("red")}
+          style={{ marginBottom: "15px" }}
         >
-          betRed
+          RED
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
           onClick={() => this.onSubmit("even")}
+          style={{ marginBottom: "15px" }}
         >
-          betEven
+          EVEN
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
           onClick={() => this.onSubmit("odd")}
+          style={{ marginBottom: "15px" }}
         >
-          betOdd
+          ODD
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
           onClick={() => this.onSubmit("1to18")}
+          style={{ marginBottom: "15px" }}
         >
-          bet1to18
+          1-18
         </button>
         <button
           className="ui button"
           disabled={this.props.disabled}
           onClick={() => this.onSubmit("19to36")}
+          style={{ marginBottom: "15px" }}
         >
-          bet19to36
+          19-36
         </button>
       </div>
     );

@@ -1,4 +1,6 @@
 import React from "react";
+import Button from "semantic-ui-react/dist/commonjs/elements/Button";
+import {Modal} from "semantic-ui-react";
 
 class InputBar extends React.Component {
   state = { amount: "" };
@@ -23,13 +25,14 @@ class InputBar extends React.Component {
           <label> {this.props.inputText} </label>
           <input
             type="text"
+            placeholder={this.props.altText}
             value={this.state.amount}
             onChange={this.onInputChange}
             disabled={this.props.disabled}
           />
-          <button className="ui button" disabled={this.props.disabled}>
+          <Button disabled={this.props.disabled} color="black" style={{marginTop:"5px"}}>
             Confirm
-          </button>
+          </Button>
         </form>
       </div>
     );

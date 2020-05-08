@@ -11,7 +11,6 @@ class Bets3 extends React.Component {
     ready: false
   };
 
-
   onSubmit = async type => {
     // the bet with the type specified on the selected button is "returned" to the app
     // the numbers come form the NumberFields and are handled by the receiver function
@@ -261,7 +260,7 @@ class Bets3 extends React.Component {
             this.numberCountCheck();
           }}
         >
-          bet 1 Number
+          1NR
         </button>
         <button
           className="ui button"
@@ -271,7 +270,7 @@ class Bets3 extends React.Component {
             this.numberCountCheck();
           }}
         >
-          bet 2 combo
+          2NR
         </button>
         <button
           className="ui button"
@@ -281,10 +280,10 @@ class Bets3 extends React.Component {
             this.numberCountCheck();
           }}
         >
-          bet 4 combo
+          4NR
         </button>
         {numField}
-       </div>
+      </div>
     );
   }
 }
