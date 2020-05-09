@@ -1,5 +1,5 @@
 import React from "react";
-import InputBar from "./InputBar";
+import InputBar from "../helpers/InputBar";
 import { withRouter } from "react-router-dom";
 
 class JoinPage extends React.Component {

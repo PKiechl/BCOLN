@@ -1,5 +1,5 @@
 import React from "react";
-import NumberField from "../NumberField";
+import NumberField from "../helpers/NumberField";
 import { Button, Header, Icon } from "semantic-ui-react";
 import Modal from "semantic-ui-react/dist/commonjs/modules/Modal";
 

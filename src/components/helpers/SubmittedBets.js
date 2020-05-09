@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "semantic-ui-react/dist/commonjs/elements/Icon";
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/index";
 
 class SubmittedBets extends React.Component {
   render() {

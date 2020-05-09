@@ -40,25 +40,14 @@ contract Oracle is usingOraclize{
 
         //to debug, check with ethereum-bridge in terminal
         emit LogQuerySent("sent query");
-
     }
 
     function __callback(bytes32 myQueryId, string memory result) public {
         //https://medium.com/aigang-network/how-ethereum-contract-can-communicate-with-external-data-source-2e32616ea180
         urng = parseInt(result);
-//        done=true;
         emit LogQueryDone(myQueryId, result);
     }
 
-//    function setDoneFalse() public{
-//        done=false;
-//    }
-//
-//    function getDone()public view returns (bool){
-//        return done;
-//    }
-
-    ////
     function getRandom()public view returns (bytes32){
         return rng;
     }

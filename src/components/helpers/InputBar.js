@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "semantic-ui-react/dist/commonjs/elements/Button";
+import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
 
 class InputBar extends React.Component {
   state = { amount: "" };
