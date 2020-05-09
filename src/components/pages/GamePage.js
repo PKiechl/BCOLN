@@ -280,7 +280,7 @@ class GamePage extends React.Component {
     await this.resetRouletteState();
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
-    const res = await RouletteContract.methods.leave();
+    const res = await RouletteContract.methods.leave(this.state.address);
     await res.send({
       from: account,
       gasPrice: 2000,

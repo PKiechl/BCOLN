@@ -35,12 +35,12 @@ contract Roulette{
     event ClientReady(address client, uint readyCount);
 
     //#################### CONSTRUCTOR #################################################################################
-    constructor(address payable _oracleAddress) payable public {
-        oracle = Oracle(_oracleAddress);
+    constructor(address payable orAddress) payable public {
+        oracle = Oracle(orAddress);
         readyCount = 0;
         clientCount = 0;
         gameFinished = false;
-        oracleAddress = _oracleAddress;
+        oracleAddress = orAddress;
     }
 
     //#################### METHODS #####################################################################################
@@ -51,16 +51,27 @@ contract Roulette{
         emit ClientJoined(clientCount);
     }
 
-    function leave() public {
+    function leave(address leaver) public {
         // allows client to leave the game
         if (clientCount >= 1) {
             clientCount=clientCount-1;
             emit ClientLeft(clientCount);
             // in case the firstClient leaves
             // TODO
+            if(clientCount==0){
+                delete firstClient;
+            }
+            if(leaver == firstClient){
+                for(uint i=0;i<bets.length;i++){
+                    bet memory temp=bets[i];
+                    if(temp.owner != leaver){
+                        firstClient=temp.owner;
+                        break;
+                    }
+                }
+            }
         }
     }
-
 
     function setReady() public {
         // allows client to mark as ready / finished betting
@@ -74,32 +85,23 @@ contract Roulette{
         allReady();
     }
 
-    function getResult() public view returns (uint){
-        // allows clients to get the results of a finished game
-        return (lastRoundWinningNumber);
-    }
-
     //### GAME MANAGEMENT
     function allReady() private {
         if (readyCount == clientCount) {
-//            playRoulette();
             createRandomNumber();
         }
     }
 
-    function createRandomNumber()public{
+    function createRandomNumber() private{
         gameFinished=true;
         oracle.generateRandomNumber();
-//        playRoulette();
     }
 
-    function getRandomNumber()public{
+    function getRandomNumber() private{
         randomNumber=oracle.getRandomNumber();
-
     }
 
     function playRoulette() public {
-        //todo test race conditions
         require(clientCount==readyCount);
 
         if(msg.sender == firstClient){
@@ -128,6 +130,7 @@ contract Roulette{
         owner.transfer(winningAmount);
     }
 
+    //todo return back to private
     function teardown() public {
         clientCount=0;
         readyCount=0;
@@ -228,7 +231,7 @@ contract Roulette{
         betRange(19, 18, 2);
     }
 
-    function betModulo(uint8 remainder, uint8 divisor) public {
+    function betModulo(uint8 remainder, uint8 divisor) private {
         uint8[] memory numbers = new uint8[](36/divisor);
         uint8 counter = 0;
         for (uint8 i = 1; i < 37; i++) {
@@ -282,6 +285,5 @@ contract Roulette{
         numbers[3] = number4;
         createBet(numbers, 9);
     }
-
 
 }

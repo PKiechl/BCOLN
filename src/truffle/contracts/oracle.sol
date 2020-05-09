@@ -48,9 +48,9 @@ contract Oracle is usingOraclize{
         emit LogQueryDone(myQueryId, result);
     }
 
-    function getRandom()public view returns (bytes32){
-        return rng;
-    }
+//    function getRandom()public view returns (bytes32){
+//        return rng;
+//    }
 
 
 }
