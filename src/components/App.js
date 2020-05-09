@@ -105,6 +105,15 @@ class App extends React.Component {
         if (event.event === "EventFirstReadyClient") {
           console.log("First Client ready: ", event.returnValues.client);
         }
+        if (event.event === "ClientJoined") {
+          console.log("client joined, count: ", event.returnValues.clientCount);
+        }
+        if (event.event === "ClientLeft") {
+          console.log("client left, count: ", event.returnValues.clientCount);
+        }
+        if (event.event === "ClientReady") {
+          console.log("client ready, readyCount: ", event.returnValues.readyCount, ", address: ", event.returnValues.client);
+        }
         if (event.event === "RouletteDone") {
           this.setState({ winningNumber: event.returnValues.rng });
           this.getAccountBalance();
@@ -269,14 +278,6 @@ class App extends React.Component {
 
   callLeave = async () => {
     await this.resetRouletteState();
-    window.history.back();
-    console.log("leave/back");
-    await this.setState({ address: null });
-    await this.setState({isWheelShowing:false});
-  };
-
-  async resetRouletteState() {
-    // note: leave/join paid by account zero, the bank
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
     const res = await RouletteContract.methods.leave();
@@ -285,6 +286,22 @@ class App extends React.Component {
       gasPrice: 2000,
       gasLimit: "500000"
     });
+    window.history.back();
+    console.log("leave/back");
+    await this.setState({ address: null });
+    await this.setState({isWheelShowing:false});
+  };
+
+  async resetRouletteState() {
+    // note: leave/join paid by account zero, the bank
+    // const accounts = await web3.eth.getAccounts();
+    // const account = accounts[0];
+    // const res = await RouletteContract.methods.leave();
+    // await res.send({
+    //   from: account,
+    //   gasPrice: 2000,
+    //   gasLimit: "500000"
+    // });
     // TODO: this might have to move somewhere other
     this.setState({ ready: false });
     this.setState({ bet: false });

@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Header, Icon, Modal } from "semantic-ui-react";
 
 const ModalWon = props => {
-  console.log("modal won: ", props.amountWon);
+  // console.log("modal won: ", props.amountWon);
   let message = "";
   let message2 = "";
 

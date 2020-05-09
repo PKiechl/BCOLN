@@ -30,6 +30,9 @@ contract Roulette{
     event RouletteDone(address client, uint rng);
     event EventFirstReadyClient(address client);
     event NotFirstClient(address client);
+    event ClientJoined(uint clientCount);
+    event ClientLeft(uint clientCount);
+    event ClientReady(address client, uint readyCount);
 
     //#################### CONSTRUCTOR #################################################################################
     constructor(address payable _oracleAddress) payable public {
@@ -45,13 +48,14 @@ contract Roulette{
     function join() public {
         // allows client to enter the game
         clientCount=clientCount+1;
+        emit ClientJoined(clientCount);
     }
 
     function leave() public {
         // allows client to leave the game
         if (clientCount >= 1) {
             clientCount=clientCount-1;
-
+            emit ClientLeft(clientCount);
             // in case the firstClient leaves
             // TODO
         }
@@ -61,6 +65,7 @@ contract Roulette{
     function setReady() public {
         // allows client to mark as ready / finished betting
         readyCount=readyCount+1;
+        emit ClientReady(msg.sender, readyCount);
         if (readyCount == 1)
         {
             firstClient = msg.sender;
