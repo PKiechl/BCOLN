@@ -38,6 +38,7 @@ class App extends React.Component {
     bet: false,
     // ready: -> player done placing bets
     ready: false,
+    joined: false,
     amount: "",
     bets: [],
     ballStopped: false,
@@ -45,7 +46,7 @@ class App extends React.Component {
     isModalShowing: false,
     isWheelShowing: false,
     ethsAtJoin: 0,
-    showModalWon: false
+    showModalWon: false,
   };
   constructor(props) {
     super(props);
@@ -53,23 +54,11 @@ class App extends React.Component {
     this.watchEvents(RouletteContract);
     document.addEventListener(
       "winningNumberDetermined",
-      function(e) {
+      function (e) {
         this.setState({ ballStopped: true });
       }.bind(this)
     );
   }
-
-  // openModalHandler = () => {
-  //   this.setState({
-  //     isModalShowing: true
-  //   });
-  // };
-  //
-  // closeModalHandler = () => {
-  //   this.setState({
-  //     isModalShowing: false
-  //   });
-  // };
 
   tearDown = async () => {
     const accounts = await web3.eth.getAccounts();
@@ -79,7 +68,7 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("called teardown", result);
   };
@@ -87,40 +76,50 @@ class App extends React.Component {
   async watchEvents(contract) {
     contract.events.allEvents(
       {
-        fromBlock: "latest"
+        fromBlock: "latest",
       },
       (error, event) => {
-        if (error) {
-          console.error("error while waiting for events");
-          return;
-        }
-        console.log("event arrived.", event.event);
-        if (event.event === "LogQueryDone") {
-          console.log("query returned result: ", event.returnValues.result);
-          this.callPlay();
-        }
-        if (event.event === "NotFirstClient") {
-          console.log("NotFirstClient: ", event.returnValues.client);
-        }
-        if (event.event === "EventFirstReadyClient") {
-          console.log("First Client ready: ", event.returnValues.client);
-        }
-        if (event.event === "ClientJoined") {
-          console.log("client joined, count: ", event.returnValues.clientCount);
-        }
-        if (event.event === "ClientLeft") {
-          console.log("client left, count: ", event.returnValues.clientCount);
-        }
-        if (event.event === "ClientReady") {
-          console.log("client ready, readyCount: ", event.returnValues.readyCount, ", address: ", event.returnValues.client);
-        }
-        if (event.event === "RouletteDone") {
-          this.setState({ winningNumber: event.returnValues.rng });
-          this.getAccountBalance();
-          throwBall(event.returnValues.rng);
-          setTimeout(() => {
-            this.setState({ showModalWon: true });
-          }, 4000);
+        if (this.state.joined) {
+          if (error) {
+            console.error("error while waiting for events");
+            return;
+          }
+          console.log("event arrived.", event.event);
+          if (event.event === "LogQueryDone") {
+            console.log("query returned result: ", event.returnValues.result);
+            this.callPlay();
+          }
+          if (event.event === "NotFirstClient") {
+            console.log("NotFirstClient: ", event.returnValues.client);
+          }
+          if (event.event === "EventFirstReadyClient") {
+            console.log("First Client ready: ", event.returnValues.client);
+          }
+          if (event.event === "ClientJoined") {
+            console.log(
+              "client joined, count: ",
+              event.returnValues.clientCount
+            );
+          }
+          if (event.event === "ClientLeft") {
+            console.log("client left, count: ", event.returnValues.clientCount);
+          }
+          if (event.event === "ClientReady") {
+            console.log(
+              "client ready, readyCount: ",
+              event.returnValues.readyCount,
+              ", address: ",
+              event.returnValues.client
+            );
+          }
+          if (event.event === "RouletteDone") {
+            this.setState({ winningNumber: event.returnValues.rng });
+            this.getAccountBalance();
+            throwBall(event.returnValues.rng);
+            setTimeout(() => {
+              this.setState({ showModalWon: true });
+            }, 4000);
+          }
         }
       }
     );
@@ -133,17 +132,17 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("called play", result);
   };
 
-  setAmount = async amount => {
+  setAmount = async (amount) => {
     await this.setState({ amount: amount });
     console.log(this.state.amount);
   };
 
-  callSetReady = async event => {
+  callSetReady = async (event) => {
     if (!this.state.wheelLoaded) {
       // showRouletteWheel();
       this.setState({ wheelLoaded: true });
@@ -156,7 +155,7 @@ class App extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("called ready", result);
     this.setState({ ready: true });
@@ -223,33 +222,33 @@ class App extends React.Component {
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(this.state.amount.toString(), "ether")
+      value: web3.utils.toWei(this.state.amount.toString(), "ether"),
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
-    let cnt = this.state.betCounter + 1;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       bets: [
         ...prevState.bets,
         {
           betType: betType,
           amount: this.state.amount,
-          numbers: [nr1, nr2, nr3, nr4]
-        }
-      ]
+          numbers: [nr1, nr2, nr3, nr4],
+        },
+      ],
     }));
     this.getAccountBalance();
   };
 
-  callJoin = async event => {
+  callJoin = async (event) => {
     // note: leave/join paid by account zero
+    await this.setState({ joined: true });
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
     const res = await RouletteContract.methods.join();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     console.log("joined", result);
 
@@ -267,7 +266,6 @@ class App extends React.Component {
     // resets amount and bet booleans to allow placement of another bet
     this.setState({ amount: "" });
     this.setState({ bet: false });
-
   };
 
   replayRoulette = async () => {
@@ -284,25 +282,16 @@ class App extends React.Component {
     await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000"
+      gasLimit: "500000",
     });
     window.history.back();
     console.log("leave/back");
     await this.setState({ address: null });
-    await this.setState({isWheelShowing:false});
+    await this.setState({ isWheelShowing: false });
   };
 
   async resetRouletteState() {
-    // note: leave/join paid by account zero, the bank
-    // const accounts = await web3.eth.getAccounts();
-    // const account = accounts[0];
-    // const res = await RouletteContract.methods.leave();
-    // await res.send({
-    //   from: account,
-    //   gasPrice: 2000,
-    //   gasLimit: "500000"
-    // });
-    // TODO: this might have to move somewhere other
+    // note: leave/join paid by account zero
     this.setState({ ready: false });
     this.setState({ bet: false });
     this.setState({ amount: "" });
@@ -310,6 +299,7 @@ class App extends React.Component {
     this.setState({ winningNumber: "" });
     this.setState({ ballStopped: false });
     this.setState({ showModalWon: false });
+    this.setState({ joined: false });
   }
 
   getAccountBalance = async (join = false) => {
@@ -365,7 +355,6 @@ class App extends React.Component {
                       />
                       <div className="clearfix" />
                       <ModalTable />
-
                     </div>
                   </div>
                   <div className="column">

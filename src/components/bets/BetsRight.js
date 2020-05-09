@@ -1,5 +1,4 @@
 import React from "react";
-import NumberField from "../NumberField";
 
 class BetsRight extends React.Component {
   state = {

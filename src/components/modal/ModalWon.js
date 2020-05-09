@@ -17,7 +17,7 @@ const ModalWon = props => {
   return (
     <Modal open={props.show} basic size="small">
       <Header>
-        <Icon name="chart line green" />
+        <Icon name="chart line" color = "green" />
       </Header>
       <Modal.Content>
         <h2>
