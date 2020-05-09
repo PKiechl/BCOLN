@@ -326,6 +326,7 @@ class GamePage extends React.Component {
           <InputBar
             onFormSubmit={this.setAmount}
             inputText={"enter ether amount to bet"}
+            altText={"..."}
             disabled={this.state.ready || this.state.bet}
           />
           <div className="ui grid">

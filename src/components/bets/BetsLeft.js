@@ -295,13 +295,13 @@ class BetsLeft extends React.Component {
           </div>
           <div>
             <Button
-              color="green"
+              color="black"
               disabled={!this.state.ready}
               className="ui button"
               onClick={() => this.onSubmit("4nr")}
             >
+              SUBMIT
               <Icon name="right chevron" />
-              submit numbers
             </Button>
           </div>
         </div>
@@ -324,13 +324,13 @@ class BetsLeft extends React.Component {
           </div>
           <div>
             <Button
-              color="green"
+              color="black"
               disabled={!this.state.ready}
               className="ui button"
               onClick={() => this.onSubmit("2nr")}
             >
+              SUBMIT
               <Icon name="right chevron" />
-              submit numbers
             </Button>
           </div>
         </div>
@@ -348,13 +348,13 @@ class BetsLeft extends React.Component {
           </div>
           <div>
             <Button
-              color="green"
+              color="black"
               disabled={!this.state.ready}
               className="ui button"
               onClick={() => this.onSubmit("1nr")}
             >
+              SUBMIT
               <Icon name="right chevron" />
-              submit numbers
             </Button>
           </div>
         </div>

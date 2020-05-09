@@ -18,7 +18,7 @@ class JoinPage extends React.Component {
     return (
       <div>
         <InputBar
-          inputText={"Enter ethereum account address to play Roulette"}
+          inputText={"enter ethereum account address to play"}
           altText={"0xa32B..."}
           onFormSubmit={this.setAccountAddress}
         />

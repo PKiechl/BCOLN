@@ -7,7 +7,7 @@ class SubmittedBets extends React.Component {
 
     return (
       <div className="ui  segment">
-        <h3 className="ui header">Submitted Bets</h3>
+        <h3 className="ui header">ENTERED</h3>
         <ul className="ui middle aligned divided list">
           {bets.map((value, index) => {
             let numbers = [];
