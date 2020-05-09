@@ -6,8 +6,6 @@ class InputBar extends React.Component {
 
   onInputChange = (event) => {
     //sets the entered amount into the state
-    //only integers can be entered for now
-    // this.setState({ amount: event.target.value.replace(/[^0-9.]/g, "") });
     this.setState({ amount: event.target.value });
   };
 
@@ -34,7 +32,7 @@ class InputBar extends React.Component {
             color="black"
             style={{ marginTop: "5px" }}
           >
-            Confirm
+            CONFIRM
           </Button>
         </form>
       </div>

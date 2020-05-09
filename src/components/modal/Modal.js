@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button, Icon, Modal, Image } from "semantic-ui-react";
+import Roulette from "../view/roulette.jpg";
 
 class ModalTable extends Component {
   state = { open: false };
@@ -25,7 +26,7 @@ class ModalTable extends Component {
           size="tiny"
           trigger={
             <Button primary icon style={{ backgroundColor: "black" }}>
-              Show Roulette Table <Icon name="right chevron" />
+              ROULETTE TABLE <Icon name="right chevron" />
             </Button>
           }
         >
@@ -35,7 +36,7 @@ class ModalTable extends Component {
               <Image
                 centered
                 size="large"
-                src="https://www.junkets.ca/gaming/roulette.jpg"
+                src={Roulette}
               />
             </div>
           </Modal.Content>

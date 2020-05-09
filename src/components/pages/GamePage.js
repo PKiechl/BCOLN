@@ -10,6 +10,7 @@ import ModalTable from "../modal/Modal";
 import ModalWon from "../modal/ModalWon";
 import { withRouter } from "react-router-dom";
 import { web3, RouletteContract, OracleContract } from "../service/Service";
+import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
 
 class GamePage extends React.Component {
   //using https://semantic-ui.com/ for easy css
@@ -30,11 +31,10 @@ class GamePage extends React.Component {
     isModalShowing: false,
     isWheelShowing: false,
     ethsAtJoin: 0,
-    showModalWon: false,
+    showModalWon: false
   };
   constructor(props) {
     super(props);
-    // this.setState({ address: props.location.address });
     console.log(props);
     this.watchEvents(OracleContract);
     this.watchEvents(RouletteContract);
@@ -45,7 +45,7 @@ class GamePage extends React.Component {
       address: nextProps.address,
       ethsAtJoin: nextProps.ethsAtJoin,
       eths: nextProps.eths,
-      joined: nextProps.joined,
+      joined: nextProps.joined
     });
   }
 
@@ -64,7 +64,7 @@ class GamePage extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("called teardown", result);
   };
@@ -72,7 +72,7 @@ class GamePage extends React.Component {
   async watchEvents(contract) {
     contract.events.allEvents(
       {
-        fromBlock: "latest",
+        fromBlock: "latest"
       },
       (error, event) => {
         if (this.state.joined) {
@@ -128,30 +128,36 @@ class GamePage extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("called play", result);
   };
 
-  setAmount = async (amount) => {
-    await this.setState({ amount: amount });
-    console.log(this.state.amount);
+  setAmount = async amount => {
+    if (web3.utils.isAddress(amount)) {
+      alert("Don't enter an address here:)");
+    }
+    amount.replace(/[^0-9]/g, "");
+    amount = parseInt(amount);
+    if (Number.isInteger(amount)) {
+      await this.setState({ amount: amount });
+      console.log(this.state.amount);
+    } else {
+      alert("Please only enter Integers");
+    }
   };
 
-  callSetReady = async (event) => {
+  callSetReady = async event => {
     if (!this.state.wheelLoaded) {
-      // showRouletteWheel();
       this.setState({ wheelLoaded: true });
     }
-
-    // event.preventDefault();
     const account = this.state.address;
     const res = await RouletteContract.methods.setReady();
     await res.estimateGas();
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("called ready", result);
     this.setState({ ready: true });
@@ -218,24 +224,24 @@ class GamePage extends React.Component {
       from: account,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(this.state.amount.toString(), "ether"),
+      value: web3.utils.toWei(this.state.amount.toString(), "ether")
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       bets: [
         ...prevState.bets,
         {
           betType: betType,
           amount: this.state.amount,
-          numbers: [nr1, nr2, nr3, nr4],
-        },
-      ],
+          numbers: [nr1, nr2, nr3, nr4]
+        }
+      ]
     }));
     this.getAccountBalance();
   };
 
-  callJoin = async (event) => {
+  callJoin = async event => {
     // note: leave/join paid by account zero
     await this.setState({ joined: true });
     const accounts = await web3.eth.getAccounts();
@@ -244,7 +250,7 @@ class GamePage extends React.Component {
     const result = await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     console.log("joined", result);
 
@@ -278,7 +284,7 @@ class GamePage extends React.Component {
     await res.send({
       from: account,
       gasPrice: 2000,
-      gasLimit: "500000",
+      gasLimit: "500000"
     });
     window.history.back();
     console.log("leave/back");
@@ -360,26 +366,26 @@ class GamePage extends React.Component {
             </div>
           </div>
           <SubmittedBets bets={this.state.bets} />
-          <button
-            className="ui button"
+          <Button
             disabled={!this.state.bet || this.state.ready}
             onClick={this.callSetReady}
+            color={"black"}
           >
-            Set Ready
-          </button>
+            SET READY
+          </Button>
           <button
             className="ui button"
             disabled={!this.state.bet}
             onClick={this.resetCurrentBetState}
           >
-            Place another bet
+            PLACE ANOTHER BET
           </button>
           <button
             className="ui button"
             disabled={this.state.bet}
             onClick={this.callLeave}
           >
-            back
+            BACK
           </button>
           <button className="ui button" onClick={this.tearDown}>
             testing:tearDown
