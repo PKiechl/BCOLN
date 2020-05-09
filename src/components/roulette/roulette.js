@@ -80,6 +80,7 @@ var europeanWheel = [
   "r36",
   "b11"
 ];
+
 var roulette = {
   aps: 360.0 / 37.0,
   sa: 0, // start angle

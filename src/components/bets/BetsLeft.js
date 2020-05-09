@@ -424,7 +424,7 @@ class BetsLeft extends React.Component {
             open={open}
             onOpen={this.open}
             onClose={this.close}
-            size="small"
+            size="medium"
             trigger={
               <button className="ui button" disabled={this.props.disabled}>
                 NUMBERS <Icon name="right chevron" />

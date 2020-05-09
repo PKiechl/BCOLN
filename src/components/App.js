@@ -99,6 +99,12 @@ class App extends React.Component {
           console.log("query returned result: ", event.returnValues.result);
           this.callPlay();
         }
+        if (event.event === "NotFirstClient") {
+          console.log("NotFirstClient: ", event.returnValues.client);
+        }
+        if (event.event === "EventFirstReadyClient") {
+          console.log("First Client ready: ", event.returnValues.client);
+        }
         if (event.event === "RouletteDone") {
           this.setState({ winningNumber: event.returnValues.rng });
           this.getAccountBalance();
@@ -252,6 +258,7 @@ class App extends React.Component {
     // resets amount and bet booleans to allow placement of another bet
     this.setState({ amount: "" });
     this.setState({ bet: false });
+
   };
 
   replayRoulette = async () => {

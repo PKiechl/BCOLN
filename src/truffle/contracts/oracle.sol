@@ -1,6 +1,7 @@
 pragma solidity ^0.5.11;
 
 import "./oraclizeAPI.sol";
+import "./roulette.sol";
 
 contract Oracle is usingOraclize{
 
@@ -11,7 +12,6 @@ contract Oracle is usingOraclize{
     event LogQueryNotSent(string description);
     event LogQueryDone(bytes32 id, string result);
     bytes32 rng;
-//    bool done=false;
     uint urng;
 
     constructor()public payable{

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.11;
 import "./oracle.sol";
 
-contract roulette{
+contract Roulette{
 
     //#################### CUSTOM TYPES ################################################################################
     struct bet {
@@ -22,11 +22,14 @@ contract roulette{
     uint256 randomNumber;
     uint256 lastRoundWinningNumber;
     address payable oracleAddress;
+    address payable firstClient;
     bool started=false;
 
     //#################### EVENTS ##################################################################################
     event LogSpinningWheel(string desc, address client);
     event RouletteDone(address client, uint rng);
+    event EventFirstReadyClient(address client);
+    event NotFirstClient(address client);
 
     //#################### CONSTRUCTOR #################################################################################
     constructor(address payable _oracleAddress) payable public {
@@ -48,6 +51,9 @@ contract roulette{
         // allows client to leave the game
         if (clientCount >= 1) {
             clientCount=clientCount-1;
+
+            // in case the firstClient leaves
+            // TODO
         }
     }
 
@@ -55,6 +61,11 @@ contract roulette{
     function setReady() public {
         // allows client to mark as ready / finished betting
         readyCount=readyCount+1;
+        if (readyCount == 1)
+        {
+            firstClient = msg.sender;
+            emit EventFirstReadyClient(firstClient);
+        }
         allReady();
     }
 
@@ -84,13 +95,16 @@ contract roulette{
 
     function playRoulette() public {
         //todo test race conditions
-        //but it seems to work with multiple clients.
-        if(!started){
+        require(clientCount==readyCount);
+
+        if(msg.sender == firstClient){
             started=true;
             emit LogSpinningWheel("started playing roulette", msg.sender);
             getRandomNumber();
             evaluate();
             teardown();
+        } else {
+            emit NotFirstClient(msg.sender);
         }
     }
 
@@ -117,6 +131,7 @@ contract roulette{
         delete bets;
         gameFinished=false;
         started=false;
+        delete firstClient;
         emit RouletteDone(msg.sender, lastRoundWinningNumber);
     }
 
