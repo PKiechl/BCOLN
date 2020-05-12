@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button, Icon, Modal, Image } from "semantic-ui-react";
-import Roulette from "../view/roulette.jpg";
+import Roulette from "../view/roulette.png";
 
 class ModalTable extends Component {
   /*
