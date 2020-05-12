@@ -1,20 +1,22 @@
 import React from "react";
 
 class BetsRight extends React.Component {
+  /*
+this class contains the buttons corresponding to the bets displayed on the
+right side of the UI, as well as the logic required to send the picked bet
+type to the parent component (GamePage)
+ */
   state = {
     type: null,
     nr1: "",
     nr2: "",
     nr3: "",
     nr4: "",
-    ready: false
+    ready: false,
   };
 
-  onSubmit = async type => {
-    // the bet with the type specified on the selected button is "returned" to the app
-    // the numbers come form the NumberFields and are handled by the receiver function
-
-    // if (this.validateNumbers()) {
+  onSubmit = async (type) => {
+    // the bet with the type specified on the selected button is "returned" to the GamePage
     await this.props.onClick(
       type,
       this.state.nr1,
@@ -22,14 +24,12 @@ class BetsRight extends React.Component {
       this.state.nr3,
       this.state.nr4
     );
-    // bet successful TODO: might need better checking
     this.resetState();
-    // }
   };
 
   resetState = async () => {
     // reset state to properly change the ui for consecutive bets when using
-    // place another bet in App.js
+    // place another bet in GamePage.js
     await this.setState({ type: null });
     await this.setState({ ready: false });
   };
@@ -42,7 +42,7 @@ class BetsRight extends React.Component {
           display: "flex",
           width: "45%",
           marginLeft: "auto",
-          marginRight: "0"
+          marginRight: "0",
         }}
       >
         <button

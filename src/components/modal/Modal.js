@@ -3,6 +3,11 @@ import { Button, Icon, Modal, Image } from "semantic-ui-react";
 import Roulette from "../view/roulette.jpg";
 
 class ModalTable extends Component {
+  /*
+  component is a popup window that displays its content (roulette table) to
+  the user upon request
+   */
+
   state = { open: false };
 
   open = () => this.setState({ open: true });
@@ -16,7 +21,7 @@ class ModalTable extends Component {
         style={{
           display: "flex",
           justifyContent: "center",
-          paddingBottom: "20px"
+          paddingBottom: "20px",
         }}
       >
         <Modal
@@ -33,11 +38,7 @@ class ModalTable extends Component {
           <Modal.Header>Roulette Table</Modal.Header>
           <Modal.Content>
             <div>
-              <Image
-                centered
-                size="large"
-                src={Roulette}
-              />
+              <Image centered size="large" src={Roulette} />
             </div>
           </Modal.Content>
           <Modal.Actions>

@@ -2,6 +2,7 @@ pragma solidity ^0.5.11;
 import "./oracle.sol";
 
 contract Roulette{
+    // contains the game-logic
 
     //#################### CUSTOM TYPES ################################################################################
     struct bet {
@@ -57,7 +58,6 @@ contract Roulette{
             clientCount=clientCount-1;
             emit ClientLeft(clientCount);
             // in case the firstClient leaves
-            // TODO
             if(clientCount==0){
                 delete firstClient;
             }
@@ -79,6 +79,7 @@ contract Roulette{
         emit ClientReady(msg.sender, readyCount);
         if (readyCount == 1)
         {
+            // set firstClient, used to avoid race-condition in playRoulette()
             firstClient = msg.sender;
             emit EventFirstReadyClient(firstClient);
         }
@@ -87,23 +88,28 @@ contract Roulette{
 
     //### GAME MANAGEMENT
     function allReady() private {
+        // if all clients ready, trigger oracle
         if (readyCount == clientCount) {
             createRandomNumber();
         }
     }
 
     function createRandomNumber() private{
+        // gameFinished to indicate that no more bets can be placed
         gameFinished=true;
         oracle.generateRandomNumber();
     }
 
     function getRandomNumber() private{
+        // allows roulette.sol to get the generated number from the oracle
         randomNumber=oracle.getRandomNumber();
     }
 
     function playRoulette() public {
+        // triggered upon all clients being ready
         require(clientCount==readyCount);
 
+        // only the request of the firstClient is respected to avoid race-condition
         if(msg.sender == firstClient){
             started=true;
             emit LogSpinningWheel("started playing roulette", msg.sender);
@@ -116,6 +122,7 @@ contract Roulette{
     }
 
     function evaluate() private {
+        // evaluates bets and performs the according payouts
         for(uint i=0;i<bets.length;i++){
             bet memory temp=bets[i];
             for(uint j=0;j<temp.winningNumbers.length;j++){
@@ -132,6 +139,7 @@ contract Roulette{
 
     //todo return back to private
     function teardown() public {
+        // at the end of the round, reset the game-state
         clientCount=0;
         readyCount=0;
         lastRoundWinningNumber=randomNumber;
@@ -144,6 +152,7 @@ contract Roulette{
     }
 
     function createBet(uint8[] memory winningNumbers, uint8 payoutFactor) private {
+        // creates the internal representation of the bet
         require(!gameFinished);
         bet memory temp;
         temp.winningAmount =  msg.value*payoutFactor;
@@ -152,7 +161,8 @@ contract Roulette{
         bets.push(temp);
     }
 
-//    ### BETS
+    //### BETS
+    // different bet types and their respective helpers
     //https://livecasino.com/wp-content/uploads/2018/12/How-to-bet-on-roulette-Red.png
 
     function betRed() payable public {
@@ -269,7 +279,6 @@ contract Roulette{
 
     // A bet on two numbers which are adjacent on the table, made by placing the chip on the shared line of the two numbers’ squares.
     function betSplit(uint8 number1, uint8 number2) payable public {
-        // TODO: add 'require' that numbers are adjacent (or solve it through graphical constraint)
         uint8[] memory numbers=new uint8[](2);
         numbers[0] = number1;
         numbers[1] = number2;
@@ -277,7 +286,6 @@ contract Roulette{
     }
 
     function betComboFour(uint8 number1, uint8 number2, uint8 number3, uint8 number4) payable public {
-        // TODO: add 'require' that numbers are adjacent (or solve it through graphical constraint)
         uint8[] memory numbers=new uint8[](4);
         numbers[0] = number1;
         numbers[1] = number2;

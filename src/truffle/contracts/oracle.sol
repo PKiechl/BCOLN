@@ -4,6 +4,8 @@ import "./oraclizeAPI.sol";
 import "./roulette.sol";
 
 contract Oracle is usingOraclize{
+    // Oracle, manages the generation of the random number via Oraclize
+
 
     //Random.org API-KEY:7dab0ab9-8f2f-4b2d-8ed1-b62cc1454c00
 
@@ -47,10 +49,5 @@ contract Oracle is usingOraclize{
         urng = parseInt(result);
         emit LogQueryDone(myQueryId, result);
     }
-
-//    function getRandom()public view returns (bytes32){
-//        return rng;
-//    }
-
 
 }

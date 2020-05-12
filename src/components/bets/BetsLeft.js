@@ -4,6 +4,11 @@ import { Button, Header, Icon } from "semantic-ui-react";
 import Modal from "semantic-ui-react/dist/commonjs/modules/Modal";
 
 class BetsLeft extends React.Component {
+  /*
+  this component contains the buttons corresponding to the bets displayed on the
+  left side of the UI, as well as the logic required to send the picked bet
+  type and additional information like numbers picked to the parent component (GamePage)
+   */
   state = {
     type: null,
     nr1: "",
@@ -11,13 +16,13 @@ class BetsLeft extends React.Component {
     nr3: "",
     nr4: "",
     ready: false,
-    open: false
+    open: false,
   };
 
   open = () => this.setState({ open: true });
   close = () => this.setState({ open: false });
 
-  onSubmit = async type => {
+  onSubmit = async (type) => {
     // the bet with the type specified on the selected button is "returned" to the app
     // the numbers come form the NumberFields and are handled by the receiver function
     await console.log(
@@ -36,14 +41,13 @@ class BetsLeft extends React.Component {
         this.state.nr4
       );
       this.close();
-      // bet successful TODO: might need better checking
       this.resetState();
     }
   };
 
   resetState = async () => {
     // reset state to properly change the ui for consecutive bets when using
-    // place another bet in App.js
+    // place another bet in GamePage.js
     await this.setState({ type: null });
     await this.setState({ nr1: "" });
     await this.setState({ nr2: "" });
@@ -98,8 +102,7 @@ class BetsLeft extends React.Component {
   };
 
   twoComboCheck = () => {
-    // check validity of a 2 combo numerical bet
-    // individual validity checks
+    // check whether the individual numbers adhere to the available range of numbers
     if (this.state.nr1 > 36 || this.state.nr1 < 1) {
       alert("Please enter a number between 1 and 36 for your first number!");
       this.setState({ nr1: "" });
@@ -114,22 +117,11 @@ class BetsLeft extends React.Component {
       alert("Please bet on distinct numbers!");
       return false;
     }
-    // let betsSorted = [
-    //   this.state.nr1,
-    //   this.state.nr2,
-    // ];
-    // betsSorted.sort();
-    // await this.setState({
-    //   nr1: betsSorted[0],
-    //   nr2: betsSorted[1],
-    // });
-    // TODO: valid combo logic... would require actual roulette field in UI
-    //  otherwise how is the user to know which combos are valid
     return true;
   };
 
   fourComboCheck = () => {
-    // check validity of a 4 combo numerical bet
+    // check whether the individual numbers adhere to the available range of numbers
     if (this.state.nr1 > 36 || this.state.nr1 < 1) {
       alert("Please enter a number between 1 and 36 for your first number!");
       this.setState({ nr1: "" });
@@ -161,18 +153,19 @@ class BetsLeft extends React.Component {
       alert("Please bet on distinct numbers!");
       return false;
     }
-
-    // TODO: valid combo logic... would require actual roulette field in UI
-    //  otherwise how is the user to know which combos are valid
     return true;
   };
 
   validate2combo = () => {
+    /*
+    validate whether a given combination is adhering to the rules of the game,
+    aka. if they are adjacent
+    */
     let betsSorted = [this.state.nr1, this.state.nr2];
     betsSorted.sort((a, b) => a - b);
     this.setState({
       nr1: betsSorted[0],
-      nr2: betsSorted[1]
+      nr2: betsSorted[1],
     });
     console.log(betsSorted[0]);
     console.log(betsSorted[1]);
@@ -197,19 +190,23 @@ class BetsLeft extends React.Component {
   };
 
   validate4combo = () => {
+    /*
+    validate whether a given combination is adhering to the rules of the game,
+    aka. if they are adjacent
+    */
     console.log("validate4combo");
     let bets1 = [
       this.state.nr1,
       this.state.nr2,
       this.state.nr3,
-      this.state.nr4
+      this.state.nr4,
     ];
     let betsSorted = bets1.sort((a, b) => a - b);
     this.setState({
       nr1: betsSorted[0],
       nr2: betsSorted[1],
       nr3: betsSorted[2],
-      nr4: betsSorted[3]
+      nr4: betsSorted[3],
     });
 
     if (parseInt(betsSorted[0]) % 3 === 0) {
@@ -230,7 +227,6 @@ class BetsLeft extends React.Component {
 
   validateNumbers = () => {
     // checks if numerical bets adhere to the rules of the game
-
     if (this.state.type === "4nr") {
       if (this.fourComboCheck()) {
         console.log("4combocheck valid");
@@ -266,7 +262,10 @@ class BetsLeft extends React.Component {
 
   render() {
     const { open } = this.state;
-
+    /*
+    change the numField that is being rendered depending on the type of
+    numerical bet selected
+    */
     let numField = null;
     if (this.state.type === "4nr") {
       numField = (
@@ -369,7 +368,7 @@ class BetsLeft extends React.Component {
             display: "flex",
             width: "45%",
             marginLeft: "0",
-            marginRight: "auto"
+            marginRight: "auto",
           }}
         >
           <button

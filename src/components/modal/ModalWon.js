@@ -1,8 +1,12 @@
 import React from "react";
 import { Button, Header, Icon, Modal } from "semantic-ui-react";
 
-const ModalWon = props => {
-  // console.log("modal won: ", props.amountWon);
+const ModalWon = (props) => {
+  /*
+  Popup Window shown at the end of the round, displaying a users outcome with 
+  ability to leave or join another round
+   */
+
   let message = "";
   let message2 = "";
 
@@ -17,7 +21,7 @@ const ModalWon = props => {
   return (
     <Modal open={props.show} basic size="small">
       <Header>
-        <Icon name="chart line" color = "green" />
+        <Icon name="chart line" color="green" />
       </Header>
       <Modal.Content>
         <h2>

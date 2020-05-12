@@ -2,9 +2,12 @@ import React from "react";
 import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/index";
 
 class SubmittedBets extends React.Component {
+  /*
+  component displays any bets made by user during current round
+   */
+
   render() {
     const bets = this.props.bets;
-
     return (
       <div className="ui  segment">
         <h3 className="ui header">ENTERED</h3>
@@ -23,7 +26,7 @@ class SubmittedBets extends React.Component {
 
             return (
               <div className="item" key={index}>
-                <Icon className="angle right"/>
+                <Icon className="angle right" />
                 <div className="content">
                   {" "}
                   {value.amount} eth - {value.betType}

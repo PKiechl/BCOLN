@@ -10,17 +10,22 @@ import { GameGuard } from "./helpers/guard/GameGuard";
 class App extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
+  /*
+  contains the two pages (GamePage & JoinPage). Also handles the initial join
+  of a user and gets the respective information from the JoinPage
+   */
+
   state = {
     address: null,
     eths: 0,
     joined: false,
-    ethsAtJoin: 0
+    ethsAtJoin: 0,
   };
   constructor(props) {
     super(props);
   }
 
-  callJoin = async event => {
+  callJoin = async (event) => {
     // note: leave/join paid by account zero
     if (web3.utils.isAddress(event)) {
       await this.setState({ joined: true });
@@ -32,11 +37,10 @@ class App extends React.Component {
       const result = await res.send({
         from: account,
         gasPrice: 2000,
-        gasLimit: "500000"
+        gasLimit: "500000",
       });
       console.log("joined", result);
       console.log("address: ", this.state.address);
-      // await getAccountBalance(true, this.state.address);
       await this.getAccountBalance(true);
     } else {
       alert("invalid address");

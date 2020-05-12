@@ -2,6 +2,9 @@ import React from "react";
 import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
 
 class InputBar extends React.Component {
+  /*
+  Component reads user input and sets it to state in parent component via callback
+   */
   state = { amount: "" };
 
   onInputChange = (event) => {
@@ -10,7 +13,7 @@ class InputBar extends React.Component {
   };
 
   onFormSubmit = (event) => {
-    //callback to App.js to return the amount that was entered
+    //callback to GamePage.js to return the amount that was entered
     event.preventDefault();
     this.props.onFormSubmit(this.state.amount);
   };

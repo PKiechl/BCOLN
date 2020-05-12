@@ -388,9 +388,9 @@ class GamePage extends React.Component {
           >
             BACK
           </button>
-          <button className="ui button" onClick={this.tearDown}>
-            testing:tearDown
-          </button>
+          {/*<button className="ui button" onClick={this.tearDown}>*/}
+          {/*  testing:tearDown*/}
+          {/*</button>*/}
           <ModalWon
             rng={this.state.winningNumber}
             show={this.state.showModalWon}

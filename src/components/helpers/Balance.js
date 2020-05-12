@@ -1,6 +1,9 @@
 import React from "react";
 
-const Balance = props => {
+const Balance = (props) => {
+  /*
+  Component displays information about the specified (valid) address
+   */
   return (
     <div>
       <div className="right menu">balance: {props.eths}</div>
