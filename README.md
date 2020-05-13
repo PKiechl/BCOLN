@@ -1,7 +1,7 @@
 ## Ethereum Roulette
 This dApp is our submission for the BCOLN Challenge Task at the University of Zurich.
 
-![UI](screenshots/ui.png)
+![UI](screenshots/ui_v2.png)
 
 #
 ### Setup
