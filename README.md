@@ -8,6 +8,7 @@ This dApp is our submission for the BCOLN Challenge Task at the University of Zu
 
 * Install node (version 10) and npm
 * Download [Ganache](https://www.trufflesuite.com/ganache)
+* Install the Browser Extension [MetaMask](https://metamask.io)
 * Install dependencies:
 ```
 npm install
@@ -34,6 +35,7 @@ npm start
 ```
 * Open browser and type: 
 `localhost:3000`
+* Use the Ganache Mnemonic to set up the accounts with MetaMask
 #
 ### Dependencies
 our application relies on the following dependencies:
