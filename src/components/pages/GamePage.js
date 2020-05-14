@@ -12,6 +12,12 @@ import { withRouter } from "react-router-dom";
 import { web3, RouletteContract, RouletteContract_noMM, OracleContract } from "../service/Service";
 import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
 
+// listen to event changes
+window.ethereum.on('accountsChanged', function (accounts) {
+  window.location.reload();
+});
+
+
 class GamePage extends React.Component {
   //using https://semantic-ui.com/ for easy css
 
@@ -37,7 +43,8 @@ class GamePage extends React.Component {
     super(props);
     console.log(props);
     this.watchEvents(OracleContract);
-    this.watchEvents(RouletteContract);
+    this.watchEvents(RouletteContract_noMM);
+    // this.watchEvents(RouletteContract);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -225,7 +232,8 @@ class GamePage extends React.Component {
 
     await res.send({
       from: window.web3.givenProvider.selectedAddress,
-      gasPrice: 2000,
+      gasPrice: window.web3.gasPrice,
+      // gasPrice: 2000,
       gasLimit: "500000",
       value: window.web3.utils.toWei(this.state.amount.toString(), "ether")
     });
@@ -289,7 +297,8 @@ class GamePage extends React.Component {
     await res.send({
       from: account,
       // from: window.web3.givenProvider.selectedAddress,
-      gasPrice: 2000,
+      // gasPrice: 2000,
+      gasPrice: web3.gasPrice,
       gasLimit: "500000"
     });
     window.history.back();
