@@ -1,8 +1,8 @@
 import React from "react";
 
 const Spinner = props => {
-  console.log("spinner: ", props.hide);
-  console.log("spinner: ", props.unhide);
+  // console.log("spinner: ", props.hide);
+  // console.log("spinner: ", props.unhide);
 
   if (!props.hide || props.unhide) {
     return <div />;

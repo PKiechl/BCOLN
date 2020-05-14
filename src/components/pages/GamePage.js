@@ -46,13 +46,18 @@ class GamePage extends React.Component {
     this.watchEvents(RouletteContract_noMM);
 
     // listen to event changes
+    this.refresh();
+  }
+
+  refresh = async () => {
     window.ethereum.on(
       "accountsChanged",
       function() {
+        console.log("addr", this.state.address);
         this.callLeave();
       }.bind(this)
     );
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     this.setState({
@@ -129,7 +134,7 @@ class GamePage extends React.Component {
             throwBall(event.returnValues.rng);
             setTimeout(() => {
               this.setState({ showModalWon: true });
-            }, 4000);
+            }, 5000);
           }
         }
       }
@@ -299,6 +304,7 @@ class GamePage extends React.Component {
     const accounts = await web3.eth.getAccounts();
     // const accounts = await window.web3.eth.getAccounts();
     const account = accounts[0];
+    console.log("leaving: ", this.state.address);
     const res = await RouletteContract_noMM.methods.leave(this.state.address);
     await res.send({
       from: account,
@@ -307,10 +313,11 @@ class GamePage extends React.Component {
       gasPrice: web3.gasPrice,
       gasLimit: "500000"
     });
-    window.history.back();
     console.log("leave/back");
     await this.setState({ address: null });
     await this.setState({ isWheelShowing: false });
+    // window.history.back();
+    window.location.reload()
   };
 
   async resetRouletteState() {
