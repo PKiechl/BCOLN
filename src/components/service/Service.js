@@ -6,16 +6,20 @@ import oracleData from "../../truffle/build/contracts/Oracle";
 contains variables related to web3.js and connectivity
  */
 
+
+window.web3 = new Web3(window.ethereum);
+window.ethereum.enable();
+
+
 //RPC server from GANACHE,
-const web3 = new Web3("ws://127.0.0.1:7545");
-web3.eth.defaultAccount = web3.eth.accounts[0];
+window.web3.eth.defaultAccount = window.web3.eth.accounts[0];
 
 let abi = data.abi;
 let contract_address = data.networks[5777].address;
 let oracleAbi = oracleData.abi;
 let oracle_address = oracleData.networks[5777].address;
 
-const RouletteContract = new web3.eth.Contract(abi, contract_address);
-const OracleContract = new web3.eth.Contract(oracleAbi, oracle_address);
+const RouletteContract = new window.web3.eth.Contract(abi, contract_address);
+const OracleContract = new window.web3.eth.Contract(oracleAbi, oracle_address);
 
-export { web3, OracleContract, RouletteContract };
+export {OracleContract, RouletteContract};

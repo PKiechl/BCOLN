@@ -9,7 +9,7 @@ import "../roulette/roulette.css";
 import ModalTable from "../modal/Modal";
 import ModalWon from "../modal/ModalWon";
 import { withRouter } from "react-router-dom";
-import { web3, RouletteContract, OracleContract } from "../service/Service";
+import { RouletteContract, OracleContract } from "../service/Service";
 import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
 
 class GamePage extends React.Component {
@@ -57,12 +57,12 @@ class GamePage extends React.Component {
   }
 
   tearDown = async () => {
-    const accounts = await web3.eth.getAccounts();
+    const accounts = await window.web3.eth.getAccounts();
     const account = accounts[0];
     const res = await RouletteContract.methods.teardown();
     await res.estimateGas();
     const result = await res.send({
-      from: account,
+      from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -126,7 +126,7 @@ class GamePage extends React.Component {
     const res = await RouletteContract.methods.playRoulette();
     await res.estimateGas();
     const result = await res.send({
-      from: account,
+      from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -134,7 +134,7 @@ class GamePage extends React.Component {
   };
 
   setAmount = async amount => {
-    if (web3.utils.isAddress(amount)) {
+    if (window.web3.utils.isAddress(amount)) {
       alert("Don't enter an address here:)");
     }
     amount.replace(/[^0-9]/g, "");
@@ -155,7 +155,7 @@ class GamePage extends React.Component {
     const res = await RouletteContract.methods.setReady();
     await res.estimateGas();
     const result = await res.send({
-      from: account,
+      from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -221,10 +221,10 @@ class GamePage extends React.Component {
     console.log("betType:", betType, "numbers(optional):", nr1, nr2, nr3, nr4);
 
     await res.send({
-      from: account,
+      from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000",
-      value: web3.utils.toWei(this.state.amount.toString(), "ether")
+      value: window.web3.utils.toWei(this.state.amount.toString(), "ether")
     });
     console.log("bet called with: ", this.state.amount);
     this.setState({ bet: true });
@@ -244,11 +244,11 @@ class GamePage extends React.Component {
   callJoin = async event => {
     // note: leave/join paid by account zero
     await this.setState({ joined: true });
-    const accounts = await web3.eth.getAccounts();
+    const accounts = await window.web3.eth.getAccounts();
     const account = accounts[0];
     const res = await RouletteContract.methods.join();
     const result = await res.send({
-      from: account,
+      from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -278,11 +278,11 @@ class GamePage extends React.Component {
 
   callLeave = async () => {
     await this.resetRouletteState();
-    const accounts = await web3.eth.getAccounts();
+    const accounts = await window.web3.eth.getAccounts();
     const account = accounts[0];
     const res = await RouletteContract.methods.leave(this.state.address);
     await res.send({
-      from: account,
+      from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -306,8 +306,8 @@ class GamePage extends React.Component {
 
   getAccountBalance = async (join = false) => {
     if (this.state.address) {
-      const balance = await web3.eth.getBalance(this.state.address);
-      const eths = await web3.utils.fromWei(balance.toString(), "ether");
+      const balance = await window.web3.eth.getBalance(this.state.address);
+      const eths = await window.web3.utils.fromWei(balance.toString(), "ether");
       await this.setState({ eths: eths });
       if (join) {
         await this.setState({ ethsAtJoin: eths });
@@ -388,9 +388,9 @@ class GamePage extends React.Component {
           >
             BACK
           </button>
-          {/*<button className="ui button" onClick={this.tearDown}>*/}
-          {/*  testing:tearDown*/}
-          {/*</button>*/}
+          <button className="ui button" onClick={this.tearDown}>
+            testing:tearDown
+          </button>
           <ModalWon
             rng={this.state.winningNumber}
             show={this.state.showModalWon}

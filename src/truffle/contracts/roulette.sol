@@ -137,7 +137,7 @@ contract Roulette{
         owner.transfer(winningAmount);
     }
 
-    function teardown() private {
+    function teardown() public {
         // at the end of the round, reset the game-state
         clientCount=0;
         readyCount=0;
