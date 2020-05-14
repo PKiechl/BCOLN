@@ -9,7 +9,7 @@ import "../roulette/roulette.css";
 import ModalTable from "../modal/Modal";
 import ModalWon from "../modal/ModalWon";
 import { withRouter } from "react-router-dom";
-import { RouletteContract, OracleContract } from "../service/Service";
+import { web3, RouletteContract, RouletteContract_noMM, OracleContract } from "../service/Service";
 import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
 
 class GamePage extends React.Component {
@@ -57,7 +57,8 @@ class GamePage extends React.Component {
   }
 
   tearDown = async () => {
-    const accounts = await window.web3.eth.getAccounts();
+    // const accounts = await window.web3.eth.getAccounts();
+    const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
     const res = await RouletteContract.methods.teardown();
     await res.estimateGas();
@@ -123,10 +124,11 @@ class GamePage extends React.Component {
 
   callPlay = async () => {
     const account = this.state.address;
-    const res = await RouletteContract.methods.playRoulette();
+    const res = await RouletteContract_noMM.methods.playRoulette();
     await res.estimateGas();
     const result = await res.send({
-      from: window.web3.givenProvider.selectedAddress,
+      from: account,
+      // from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -152,10 +154,11 @@ class GamePage extends React.Component {
       this.setState({ wheelLoaded: true });
     }
     const account = this.state.address;
-    const res = await RouletteContract.methods.setReady();
+    const res = await RouletteContract_noMM.methods.setReady();
     await res.estimateGas();
     const result = await res.send({
-      from: window.web3.givenProvider.selectedAddress,
+      from: account,
+      // from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -244,11 +247,12 @@ class GamePage extends React.Component {
   callJoin = async event => {
     // note: leave/join paid by account zero
     await this.setState({ joined: true });
-    const accounts = await window.web3.eth.getAccounts();
+    const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
-    const res = await RouletteContract.methods.join();
+    const res = await RouletteContract_noMM.methods.join();
     const result = await res.send({
-      from: window.web3.givenProvider.selectedAddress,
+      from: account,
+      // from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -278,11 +282,13 @@ class GamePage extends React.Component {
 
   callLeave = async () => {
     await this.resetRouletteState();
-    const accounts = await window.web3.eth.getAccounts();
+    const accounts = await web3.eth.getAccounts();
+    // const accounts = await window.web3.eth.getAccounts();
     const account = accounts[0];
-    const res = await RouletteContract.methods.leave(this.state.address);
+    const res = await RouletteContract_noMM.methods.leave(this.state.address);
     await res.send({
-      from: window.web3.givenProvider.selectedAddress,
+      from: account,
+      // from: window.web3.givenProvider.selectedAddress,
       gasPrice: 2000,
       gasLimit: "500000"
     });
@@ -306,8 +312,8 @@ class GamePage extends React.Component {
 
   getAccountBalance = async (join = false) => {
     if (this.state.address) {
-      const balance = await window.web3.eth.getBalance(this.state.address);
-      const eths = await window.web3.utils.fromWei(balance.toString(), "ether");
+      const balance = await web3.eth.getBalance(this.state.address);
+      const eths = await web3.utils.fromWei(balance.toString(), "ether");
       await this.setState({ eths: eths });
       if (join) {
         await this.setState({ ethsAtJoin: eths });

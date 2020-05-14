@@ -4,7 +4,7 @@ import JoinPage from "./pages/JoinPage";
 import Header from "./helpers/Header";
 import "./roulette/roulette.css";
 import GamePage from "./pages/GamePage";
-import { RouletteContract } from "./service/Service";
+import { web3, RouletteContract, RouletteContract_noMM } from "./service/Service";
 import { GameGuard } from "./helpers/guard/GameGuard";
 
 class App extends React.Component {
@@ -13,7 +13,7 @@ class App extends React.Component {
   /*
   contains the two pages (GamePage & JoinPage). Also handles the initial join
   of a user and gets the respective information from the JoinPage
-   */
+  */
 
   state = {
     address: null,
@@ -27,15 +27,18 @@ class App extends React.Component {
 
   callJoin = async (event) => {
     // note: leave/join paid by account zero
-    if (window.web3.utils.isAddress(event)) {
+    if (web3.utils.isAddress(event)) {
+    // if (window.web3.utils.isAddress(event)) {
       await this.setState({ joined: true });
       this.setState({ address: event });
 
-      const accounts = await window.web3.eth.getAccounts();
+      // const accounts = await window.web3.eth.getAccounts();
+      const accounts = await web3.eth.getAccounts();
       const account = accounts[0];
-      const res = await RouletteContract.methods.join();
+      const res = await RouletteContract_noMM.methods.join();
       const result = await res.send({
-        from: window.web3.givenProvider.selectedAddress,
+        from: account,
+        // from: window.web3.givenProvider.selectedAddress,
         gasPrice: 2000,
         gasLimit: "500000",
       });
@@ -49,8 +52,9 @@ class App extends React.Component {
 
   getAccountBalance = async (join = false) => {
     if (this.state.address) {
-      const balance = await window.web3.eth.getBalance(this.state.address);
-      const eths = await window.web3.utils.fromWei(balance.toString(), "ether");
+      const balance = await web3.eth.getBalance(this.state.address);
+      // const balance = await window.web3.eth.getBalance(this.state.address);
+      const eths = await web3.utils.fromWei(balance.toString(), "ether");
       await this.setState({ eths: eths });
       if (join) {
         await this.setState({ ethsAtJoin: eths });
