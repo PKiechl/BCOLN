@@ -75,19 +75,19 @@ class GamePage extends React.Component {
     }
   }
 
-  tearDown = async () => {
-    // const accounts = await window.web3.eth.getAccounts();
-    const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
-    const res = await RouletteContract.methods.teardown();
-    await res.estimateGas();
-    const result = await res.send({
-      from: window.web3.givenProvider.selectedAddress,
-      gasPrice: window.web3.gasPrice,
-      gasLimit: "500000"
-    });
-    console.log("called teardown", result);
-  };
+  // tearDown = async () => {
+  //   // const accounts = await window.web3.eth.getAccounts();
+  //   const accounts = await web3.eth.getAccounts();
+  //   const account = accounts[0];
+  //   const res = await RouletteContract.methods.teardown();
+  //   await res.estimateGas();
+  //   const result = await res.send({
+  //     from: window.web3.givenProvider.selectedAddress,
+  //     gasPrice: window.web3.gasPrice,
+  //     gasLimit: "500000"
+  //   });
+  //   console.log("called teardown", result);
+  // };
 
   async watchEvents(contract) {
     contract.events.allEvents(
@@ -416,9 +416,9 @@ class GamePage extends React.Component {
           >
             BACK
           </button>
-          <button className="ui button" onClick={this.tearDown}>
-            testing:tearDown
-          </button>
+          {/*<button className="ui button" onClick={this.tearDown}>*/}
+          {/*  testing:tearDown*/}
+          {/*</button>*/}
           <Spinner hide={this.state.ready} unhide={this.state.winningNumber} />
           <ModalWon
             rng={this.state.winningNumber}
