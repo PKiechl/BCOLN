@@ -9,14 +9,14 @@ import "../roulette/roulette.css";
 import ModalTable from "../modal/Modal";
 import ModalWon from "../modal/ModalWon";
 import { withRouter } from "react-router-dom";
-import { web3, RouletteContract, RouletteContract_noMM, OracleContract } from "../service/Service";
+import {
+  web3,
+  RouletteContract,
+  RouletteContract_noMM,
+  OracleContract
+} from "../service/Service";
 import Button from "semantic-ui-react/dist/commonjs/elements/Button/index";
-
-// listen to event changes
-window.ethereum.on('accountsChanged', function (accounts) {
-  window.location.reload();
-});
-
+import Spinner from "../helpers/Spinner";
 
 class GamePage extends React.Component {
   //using https://semantic-ui.com/ for easy css
@@ -44,7 +44,14 @@ class GamePage extends React.Component {
     console.log(props);
     this.watchEvents(OracleContract);
     this.watchEvents(RouletteContract_noMM);
-    // this.watchEvents(RouletteContract);
+
+    // listen to event changes
+    window.ethereum.on(
+      "accountsChanged",
+      function() {
+        this.callLeave();
+      }.bind(this)
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -405,6 +412,7 @@ class GamePage extends React.Component {
           <button className="ui button" onClick={this.tearDown}>
             testing:tearDown
           </button>
+          <Spinner hide={this.state.ready} unhide={this.state.winningNumber} />
           <ModalWon
             rng={this.state.winningNumber}
             show={this.state.showModalWon}
