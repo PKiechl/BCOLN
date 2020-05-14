@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import data from "../../truffle/build/contracts/roulette";
+import data from "../../truffle/build/contracts/Roulette";
 import oracleData from "../../truffle/build/contracts/Oracle";
 
 /*
