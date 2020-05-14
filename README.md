@@ -36,6 +36,7 @@ npm start
 * Open browser and type: 
 `localhost:3000`
 * Use the Ganache Mnemonic to set up the accounts with MetaMask
+    * Please Note that you may have to [reset your MetaMask accounts](https://metamask.zendesk.com/hc/en-us/articles/360015488891-Resetting-an-Account) if you have set up a new instance of Ganache!
 #
 ### Dependencies
 our application relies on the following dependencies:
