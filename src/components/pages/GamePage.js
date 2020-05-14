@@ -71,7 +71,7 @@ class GamePage extends React.Component {
     await res.estimateGas();
     const result = await res.send({
       from: window.web3.givenProvider.selectedAddress,
-      gasPrice: 2000,
+      gasPrice: window.web3.gasPrice,
       gasLimit: "500000"
     });
     console.log("called teardown", result);
@@ -136,7 +136,7 @@ class GamePage extends React.Component {
     const result = await res.send({
       from: account,
       // from: window.web3.givenProvider.selectedAddress,
-      gasPrice: 2000,
+      gasPrice: window.web3.gasPrice,
       gasLimit: "500000"
     });
     console.log("called play", result);
@@ -166,7 +166,7 @@ class GamePage extends React.Component {
     const result = await res.send({
       from: account,
       // from: window.web3.givenProvider.selectedAddress,
-      gasPrice: 2000,
+      gasPrice: window.web3.gasPrice,
       gasLimit: "500000"
     });
     console.log("called ready", result);
@@ -233,7 +233,6 @@ class GamePage extends React.Component {
     await res.send({
       from: window.web3.givenProvider.selectedAddress,
       gasPrice: window.web3.gasPrice,
-      // gasPrice: 2000,
       gasLimit: "500000",
       value: window.web3.utils.toWei(this.state.amount.toString(), "ether")
     });
@@ -261,7 +260,7 @@ class GamePage extends React.Component {
     const result = await res.send({
       from: account,
       // from: window.web3.givenProvider.selectedAddress,
-      gasPrice: 2000,
+      gasPrice: window.web3.gasPrice,
       gasLimit: "500000"
     });
     console.log("joined", result);

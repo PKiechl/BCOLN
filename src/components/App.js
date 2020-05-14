@@ -39,7 +39,7 @@ class App extends React.Component {
       const result = await res.send({
         from: account,
         // from: window.web3.givenProvider.selectedAddress,
-        gasPrice: 2000,
+        gasPrice: window.web3.gasPrice,
         gasLimit: "500000",
       });
       console.log("joined", result);
